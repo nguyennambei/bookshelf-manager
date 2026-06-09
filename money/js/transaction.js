@@ -1,40 +1,73 @@
-// Dữ liệu mẫu (Mock Data) cho các giao dịch để đổ vào minh họa
+// =========================================================================
+// 1. KHỞI TẠO BỘ DỮ LIỆU GIẢ LẬP ĐỂ ĐỔ VÀO MINH HỌA (THÁNG 06/2026)
+// =========================================================================
 let transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [
-    { id: "tx_1", date: "2026-06-09", accountId: "acc_1", categoryId: "cat_1", title: "Cơm trưa văn phòng", amount: 45000, type: "expense" },
-    { id: "tx_2", date: "2026-06-09", accountId: "acc_3", categoryId: "cat_4", title: "Thanh toán hóa đơn điện tháng 5", amount: 1450000, type: "expense" },
-    { id: "tx_3", date: "2026-06-08", accountId: "acc_2", categoryId: "cat_3", title: "Đổ xăng đầy bình xe máy", amount: 70000, type: "expense" },
-    { id: "tx_4", date: "2026-06-07", accountId: "acc_2", categoryId: "cat_5", title: "Nhận tiền Freelance Thiết kế UI", amount: 4500000, type: "income" },
-    { id: "tx_5", date: "2026-06-06", accountId: "acc_1", categoryId: "cat_2", title: "Cà phê họp nhóm Highlands", amount: 120000, type: "expense" },
-    { id: "tx_6", date: "2026-06-05", accountId: "acc_2", categoryId: "cat_1", title: "Mua nhu yếu phẩm tại siêu thị", amount: 350000, type: "expense" },
-    { id: "tx_7", date: "2026-06-04", accountId: "acc_3", categoryId: "cat_2", title: "Đặt trà sữa cho cả phòng", amount: 280000, type: "expense" }
+    // --- CÁC KHOẢN THU NHẬP (INCOME) ---
+    { id: "tx_mock_1", date: "2026-06-05", accountId: "acc_2", categoryId: "cat_8", title: "Nhận lương công ty tháng 05", amount: 18500000, type: "income" },
+    { id: "tx_mock_2", date: "2026-06-08", accountId: "acc_2", categoryId: "cat_9", title: "Thanh toán dự án Freelance Web", amount: 4500000, type: "income" },
+
+    // --- CÁC KHOẢN CHI TIÊU CỐ ĐỊNH (EXPENSE) ---
+    { id: "tx_mock_3", date: "2026-06-01", accountId: "acc_3", categoryId: "cat_5", title: "Hóa đơn tiền điện sinh hoạt gia đình", amount: 1350000, type: "expense" },
+    { id: "tx_mock_4", date: "2026-06-02", accountId: "acc_2", categoryId: "cat_6", title: "Cước Internet cáp quang Viettel", amount: 275000, type: "expense" },
+    { id: "tx_mock_5", date: "2026-06-02", accountId: "acc_1", categoryId: "cat_7", title: "Tiền nước & Phí quản lý chung cư", amount: 480000, type: "expense" },
+
+    // --- CÁC KHOẢN CHI TIÊU HÀNG NGÀY (EXPENSE) ---
+    { id: "tx_mock_6", date: "2026-06-09", accountId: "acc_1", categoryId: "cat_1", title: "Ăn trưa bún đậu mắm tôm cùng công ty", amount: 55000, type: "expense" },
+    { id: "tx_mock_7", date: "2026-06-08", accountId: "acc_1", categoryId: "cat_2", title: "Cà phê Starbucks tiếp khách hàng", amount: 115000, type: "expense" },
+    { id: "tx_mock_8", date: "2026-06-07", accountId: "acc_2", categoryId: "cat_3", title: "Đổ đầy bình xăng xe máy", amount: 80000, type: "expense" },
+    { id: "tx_mock_9", date: "2026-06-06", accountId: "acc_1", categoryId: "cat_1", title: "Mua đồ ăn tối tại siêu thị WinMart", amount: 320000, type: "expense" },
+    { id: "tx_mock_10", date: "2026-06-05", accountId: "acc_3", categoryId: "cat_2", title: "Đặt trà sữa GongCha cho cả team", amount: 240000, type: "expense" },
+    { id: "tx_mock_11", date: "2026-06-04", accountId: "acc_2", categoryId: "cat_4", title: "Thay dầu nhớt định kỳ xe máy", amount: 350000, type: "expense" },
+    { id: "tx_mock_12", date: "2026-06-03", accountId: "acc_1", categoryId: "cat_1", title: "Đi ăn tối buffet lẩu nướng cuối tuần", amount: 690000, type: "expense" },
+    { id: "tx_mock_13", date: "2026-06-01", accountId: "acc_1", categoryId: "cat_1", title: "Mua bánh mì ăn sáng cả tuần", amount: 120000, type: "expense" }
 ];
 
-// Cấu hình phân trang dữ liệu tĩnh
+// Cấu hình phân trang cho Nhật ký trang chủ
 const rowsPerPage = 5;
 let currentPage = 1;
 
+// =========================================================================
+// 2. KHỞI TẠO LOGIC CHO TRANG CHỦ (INDEX.HTML)
+// =========================================================================
 function initTransactionLogic() {
+    // Cơ chế Force-Load: Đè dữ liệu giả lập vào LocalStorage nếu bộ nhớ máy bị kẹt hoặc trống
+    if (!localStorage.getItem("classic_transactions") || JSON.parse(localStorage.getItem("classic_transactions")).length < 10) {
+        localStorage.setItem("classic_transactions", JSON.stringify(transactions));
+    } else {
+        transactions = JSON.parse(localStorage.getItem("classic_transactions"));
+    }
+
+    // Tự động gán ngày hôm nay vào ô chọn ngày của form
+    const dateInput = document.getElementById("tx-date");
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    // Chạy các hàm hiển thị dữ liệu lên màn hình
     calculateLiveBalances();
     renderTransactionTable();
 
-    // Xử lý sự kiện ghi chép giao dịch mới
+    // Xử lý sự kiện gửi Form Giao dịch mới
     const form = document.querySelector(".flex-col-form form");
     if (form) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
 
-            const title = form.querySelector("input[type='text']").value.trim();
-            const amount = parseFloat(form.querySelector("input[type='number']").value) || 0;
+            const selectedDate = document.getElementById("tx-date").value;
+            const title = document.getElementById("tx-title").value.trim();
+            const amount = parseFloat(document.getElementById("tx-amount").value) || 0;
             const accountId = document.getElementById("tx-account").value;
             const categoryId = document.getElementById("tx-category").value;
             const type = document.getElementById("tx-type").value;
 
-            // Lấy ngày hiện tại định dạng YYYY-MM-DD
-            const today = new Date().toISOString().split('T')[0];
+            if (!selectedDate) {
+                alert("Vui lòng chọn ngày giao dịch hợp lệ!");
+                return;
+            }
 
             const newTx = {
                 id: "tx_" + Date.now(),
-                date: today,
+                date: selectedDate,
                 accountId,
                 categoryId,
                 title,
@@ -42,49 +75,54 @@ function initTransactionLogic() {
                 type
             };
 
-            transactions.unshift(newTx); // Đưa giao dịch mới lên đầu danh sách
+            // Thêm lên đầu mảng và sắp xếp lại theo thứ tự ngày mới nhất
+            transactions.unshift(newTx);
+            transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Lưu lại vào bộ nhớ trình duyệt
             localStorage.setItem("classic_transactions", JSON.stringify(transactions));
 
             form.reset();
-            currentPage = 1; // Quay về trang 1 để xem giao dịch mới nhất
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+            currentPage = 1; // Đẩy người dùng về trang 1 để xem dòng vừa nhập
             calculateLiveBalances();
             renderTransactionTable();
-            alert("Đã ghi nhận giao dịch thành công!");
+            alert("Đã ghi sổ giao dịch thành công!");
         });
     }
 }
 
-// HÀM QUAN TRỌNG: Tính toán lại số dư động (Live Balance) dựa trên giao dịch
+// =========================================================================
+// 3. LOGIC TÍNH SỐ DƯ ĐỘNG & VẼ CÁC THẺ (SO-DU-TAI-KHOAN.HTML)
+// =========================================================================
 function calculateLiveBalances() {
-    // Đọc số dư gốc đã cấu hình từ tài khoản
-    let baseAccounts = JSON.parse(localStorage.getItem("classic_accounts")) || [
-        { id: "acc_1", name: "Ví cá nhân", type: "cash", balance: 1420000 },
-        { id: "acc_2", name: "Vietcombank (VCB)", type: "bank", balance: 24500000 },
-        { id: "acc_3", name: "UOB Credit Card", type: "credit", balance: -3850000 }
-    ];
+    const gridContainer = document.querySelector(".account-summary-grid");
+    if (!gridContainer) return; // Nếu không ở trang hiển thị số dư, thoát hàm
 
-    // Tạo bản đồ tính toán số dư
+    // Đọc số dư gốc từ phần cài đặt tài khoản
+    let baseAccounts = JSON.parse(localStorage.getItem("classic_accounts")) || [];
+    
+    // Tạo bản đồ để tính toán bù trừ tiền
     let liveBalances = {};
     baseAccounts.forEach(acc => {
         liveBalances[acc.id] = acc.balance;
     });
 
-    // Duyệt qua tất cả giao dịch để cộng/trừ tiền thực tế
-    transactions.forEach(tx => {
+    // Duyệt qua toàn bộ danh sách giao dịch để làm phép tính cộng / trừ tiền thực tế
+    const allTx = JSON.parse(localStorage.getItem("classic_transactions")) || transactions;
+    allTx.forEach(tx => {
         if (liveBalances[tx.accountId] !== undefined) {
             if (tx.type === "expense") {
-                liveBalances[tx.accountId] -= tx.amount; // Chi ra thì trừ tiền
+                liveBalances[tx.accountId] -= tx.amount;
             } else {
-                liveBalances[tx.accountId] += tx.amount; // Thu vào thì cộng tiền
+                liveBalances[tx.accountId] += tx.amount;
             }
         }
     });
 
-    // Vẽ lại bảng số dư cập nhật lên màn hình chính
-    const gridContainer = document.querySelector(".account-summary-grid");
-    if (!gridContainer) return;
+    // Vẽ giao diện các thẻ số dư ví tài khoản lên màn hình
     gridContainer.innerHTML = "";
-
     baseAccounts.forEach(acc => {
         const currentBal = liveBalances[acc.id];
         const card = document.createElement("div");
@@ -96,23 +134,27 @@ function calculateLiveBalances() {
 
         card.innerHTML = `
             <span class="badge ${badgeClass}">${badgeText}</span>
-            <h4>${acc.name}</h4>
+            <h4 style="margin: 10px 0 5px 0;">${acc.name}</h4>
             <p class="balance-amount ${currentBal < 0 ? 'txt-red' : ''}">${formatted}</p>
         `;
         gridContainer.appendChild(card);
     });
 }
 
-// Vẽ bảng nhật ký và xử lý giao diện phân trang
+// =========================================================================
+// 4. LOGIC PHÂN TRANG VÀ IN BẢNG NHẬT KÝ (INDEX.HTML)
+// =========================================================================
 function renderTransactionTable() {
-    // SỬA DÒNG NÀY: Lấy chính xác ID tbody của bảng giao dịch ở index.html
     const tbody = document.getElementById("table-transaction-body");
-    if (!tbody) return; 
+    if (!tbody) return; // Nếu không ở trang chủ, thoát hàm
     tbody.innerHTML = "";
 
+    const localTx = JSON.parse(localStorage.getItem("classic_transactions")) || transactions;
+
+    // Phân tách mảng dữ liệu theo vị trí trang hiện tại
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    const paginatedItems = transactions.slice(start, end);
+    const paginatedItems = localTx.slice(start, end);
 
     const localAccs = JSON.parse(localStorage.getItem("classic_accounts")) || [];
     const localCats = JSON.parse(localStorage.getItem("classic_categories")) || [];
@@ -137,23 +179,22 @@ function renderTransactionTable() {
             <td><span class="table-tag ${tagClass}">${acc.name}</span></td>
             <td>${cleanMain ? cleanMain + " > " : ""}${cat.sub}</td>
             <td>${tx.title}</td>
-            <td class="text-right ${colorClass}">${sign}${formattedAmount}</td>
+            <td class="text-right ${colorClass}" style="font-weight:bold;">${sign}${formattedAmount}</td>
         `;
         tbody.appendChild(tr);
     });
 
-    renderPaginationControls();
+    renderPaginationControls(localTx.length);
 }
 
-// Tạo các nút bấm lật trang
-function renderPaginationControls() {
+function renderPaginationControls(totalItems) {
     const paginationContainer = document.querySelector(".classic-pagination");
     if (!paginationContainer) return;
     paginationContainer.innerHTML = "";
 
-    const totalPages = Math.ceil(transactions.length / rowsPerPage) || 1;
+    const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
 
-    // Nút "Trước"
+    // Nút Lùi lại page trước
     const prevBtn = document.createElement("a");
     prevBtn.href = "#";
     prevBtn.className = "page-btn";
@@ -165,7 +206,7 @@ function renderPaginationControls() {
     });
     paginationContainer.appendChild(prevBtn);
 
-    // Danh sách các số trang danh định
+    // Vòng lặp in các nút số trang định danh
     for (let i = 1; i <= totalPages; i++) {
         const pageBtn = document.createElement("a");
         pageBtn.href = "#";
@@ -179,7 +220,7 @@ function renderPaginationControls() {
         paginationContainer.appendChild(pageBtn);
     }
 
-    // Nút "Sau"
+    // Nút Tiến lên page sau
     const nextBtn = document.createElement("a");
     nextBtn.href = "#";
     nextBtn.className = "page-btn";
@@ -190,4 +231,143 @@ function renderPaginationControls() {
         if (currentPage < totalPages) { currentPage++; renderTransactionTable(); }
     });
     paginationContainer.appendChild(nextBtn);
+}
+
+// =========================================================================
+// 5. LOGIC PHÂN TÍCH TỶ TRỌNG VÀ BÁO CÁO THÁNG (BAO-CAO-THANG.HTML)
+// =========================================================================
+function initMonthlyReportLogic() {
+    const monthPicker = document.getElementById("report-month-picker");
+    if (!monthPicker) return;
+
+    // Mặc định nạp tháng/năm hiện tại lên thanh filter ô input month (Dạng YYYY-MM)
+    const today = new Date();
+    const currentMonthStr = today.toISOString().substring(0, 7); 
+    monthPicker.value = currentMonthStr;
+
+    renderMonthlyReport(currentMonthStr);
+
+    monthPicker.addEventListener("change", (e) => {
+        renderMonthlyReport(e.target.value);
+    });
+}
+let globalExpenseChart = null;
+
+function renderMonthlyReport(targetMonth) {
+    const tbody = document.getElementById("table-report-body");
+    const totalIncomeEl = document.getElementById("report-total-income");
+    const totalExpenseEl = document.getElementById("report-total-expense");
+    const netSavingsEl = document.getElementById("report-net-savings");
+
+    if (!tbody || !targetMonth) return;
+
+    const localTx = JSON.parse(localStorage.getItem("classic_transactions")) || transactions;
+    const filteredTx = localTx.filter(tx => tx.date.startsWith(targetMonth));
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let categoryMap = {};
+
+    const localCats = JSON.parse(localStorage.getItem("classic_categories")) || [];
+
+    filteredTx.forEach(tx => {
+        if (tx.type === "income") {
+            totalIncome += tx.amount;
+        } else {
+            totalExpense += tx.amount;
+        }
+
+        if (!categoryMap[tx.categoryId]) {
+            categoryMap[tx.categoryId] = { amount: 0, type: tx.type };
+        }
+        categoryMap[tx.categoryId].amount += tx.amount;
+    });
+
+    // Hiển thị số liệu 3 ô thẻ tổng
+    totalIncomeEl.textContent = new Intl.NumberFormat('vi-VN').format(totalIncome) + "đ";
+    totalExpenseEl.textContent = new Intl.NumberFormat('vi-VN').format(totalExpense) + "đ";
+    const netSavings = totalIncome - totalExpense;
+    netSavingsEl.textContent = new Intl.NumberFormat('vi-VN').format(netSavings) + "đ";
+    netSavingsEl.className = `balance-amount ${netSavings < 0 ? 'txt-red' : 'txt-green'}`;
+
+    tbody.innerHTML = "";
+
+    // Mảng lưu dữ liệu phục vụ riêng cho việc vẽ Chart Chi Tiêu
+    let chartLabels = [];
+    let chartData = [];
+
+    if (filteredTx.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:24px; color:#999;">Không tìm thấy dữ liệu thu chi nào trong tháng này!</td></tr>`;
+        // Hủy chart cũ nếu tháng mới chọn không có dữ liệu
+        if (globalExpenseChart) { globalExpenseChart.destroy(); globalExpenseChart = null; }
+        return;
+    }
+
+    // Duyệt map và đổ dữ liệu vào bảng
+    for (const catId in categoryMap) {
+        const item = categoryMap[catId];
+        const catObj = localCats.find(c => c.id === catId) || { main: "Khác", sub: "Chưa phân loại" };
+        const cleanName = `${catObj.main.replace("Khoản Chi > ", "").replace("Khoản Thu > ", "")} > ${catObj.sub}`;
+        
+        const tr = document.createElement("tr");
+        const formattedAmt = new Intl.NumberFormat('vi-VN').format(item.amount) + "đ";
+        
+        const totalGroup = item.type === "income" ? totalIncome : totalExpense;
+        const percentage = totalGroup > 0 ? ((item.amount / totalGroup) * 100).toFixed(1) : 0;
+
+        const typeText = item.type === "income" ? "Thu nhập" : "Khoản chi";
+        const colorClass = item.type === "income" ? "txt-green" : "txt-red";
+
+        tr.innerHTML = `
+            <td><strong>${cleanName}</strong></td>
+            <td class="${colorClass}">${typeText}</td>
+            <td class="text-right" style="font-weight:bold;">${formattedAmt}</td>
+            <td class="text-right" style="color:#555;">${percentage}%</td>
+        `;
+        tbody.appendChild(tr);
+
+        // GOM DỮ LIỆU ĐỂ VẼ CHART (Chỉ vẽ các mục thuộc nhóm CHI TIÊU)
+        if (item.type === "expense") {
+            chartLabels.push(catObj.sub); // Lấy tên danh mục con làm nhãn
+            chartData.push(item.amount);  // Lấy số tiền làm giá trị phân mảnh
+        }
+    }
+
+    // TIẾN HÀNH KHỞI TẠO VÀ VẼ BIỂU ĐỒ TRÒN (PIE CHART)
+    const ctx = document.getElementById('expensePieChart');
+    if (ctx) {
+        // Nếu đã có thực thể chart đang chạy trước đó, cần hủy (destroy) để vẽ mới hoàn toàn
+        if (globalExpenseChart) {
+            globalExpenseChart.destroy();
+        }
+
+        if (chartData.length === 0) {
+            // Nếu tháng này chỉ có thu mà không có chi, không vẽ biểu đồ chi tiêu
+            return;
+        }
+
+        globalExpenseChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: [
+                        '#e74c3c', '#3498db', '#f1c40f', '#2ecc71', 
+                        '#9b59b6', '#1abc9c', '#e67e22', '#34495e'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Đẩy các nhãn chú thích xuống dưới đáy cho gọn gọn
+                        labels: { boxWidth: 12, font: { family: 'inherit', size: 11 } }
+                    }
+                }
+            }
+        });
+    }
 }

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ Thu Chi Cổ Điển - Nhật Ký Giao Dịch</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>SỔ THU CHI CỔ ĐIỂN</h1>
+        <nav class="app-navigation">
+            <a href="index.html" class="nav-link active">Nhật Ký Giao Dịch</a>
+            <a href="setting/so-du-tai-khoan.html" class="nav-link">Số Dư Hiện Tại</a>
+            <a href="setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
+            <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
+        </nav>
+    </header>
+
+    <main class="box_wrap">
+        <div class="flex-container">
+            <div class="flex-col-form">
+                <fieldset>
+                    <legend>Ghi Chép Giao Dịch</legend>
+                    <form onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Loại giao dịch:</label>
+                            <select id="tx-type">
+                                <option value="expense">Chi ra (-)</option>
+                                <option value="income">Thu vào (+)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nội dung chi tiêu:</label>
+                            <input type="text" placeholder="Ví dụ: Tiền cơm trưa" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số tiền (VNĐ):</label>
+                            <input type="number" placeholder="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tài khoản thanh toán:</label>
+                            <select id="tx-account"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Thể loại > Kiểu con:</label>
+                            <select id="tx-category"></select>
+                        </div>
+                        <button type="submit" class="btn-submit">Ghi Vào Sổ Cái</button>
+                    </form>
+                </fieldset>
+            </div>
+
+            <div class="flex-col-data">
+                <fieldset>
+                    <legend>Sổ Cái Nhật Ký Chi Tiêu</legend>
+                    <div class="table-responsive">
+                        <table class="classic-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Ngày</th>
+                                    <th style="width: 120px;">Tài khoản</th>
+                                    <th style="width: 150px;">Danh mục</th>
+                                    <th>Nội dung</th>
+                                    <th class="text-right" style="width: 110px;">Số tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-transaction-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="classic-pagination" style="margin-top: 15px; text-align: right;"></div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/account.js"></script>
+    <script src="js/category.js"></script>
+    <script src="js/transaction.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Khởi tạo các ô Chọn (Select) dữ liệu từ trang cài đặt
+            if(typeof renderAccountSelects === "function") renderAccountSelects();
+            if(typeof renderCategorySelects === "function") renderCategorySelects();
+            
+            // Kích hoạt nạp danh sách giao dịch mẫu lên bảng
+            if(typeof initTransactionLogic === "function") initTransactionLogic();
+        });
+    </script>
+</body>
+</html>

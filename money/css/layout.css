@@ -1,0 +1,35 @@
+/* --- Cấu trúc bao bọc chính (.box_wrap) --- */
+.box_wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+/* Container con phân bố các cột bên trong các trang */
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+/* Thiết lập kích thước co giãn linh hoạt dựa trên màn hình */
+.flex-col-form {
+    flex: 1 1 380px; /* Form nhập liệu rộng tối thiểu 380px */
+}
+
+.flex-col-data {
+    flex: 2 1 680px; /* Khu vực bảng biểu cần rộng hơn */
+}
+
+.flex-col-equal {
+    flex: 1 1 480px; /* Chia đôi không gian bằng nhau ở trang Settings */
+}
+
+/* --- Quản lý trạng thái phân trang màn hình (Hiện/Ẩn) --- */
+.page-section {
+    display: none; /* Mặc định ẩn hoàn toàn */
+    width: 100%;
+}
+
+.page-section.active-section {
+    display: block; /* Chỉ hiển thị phần được chọn */
+}

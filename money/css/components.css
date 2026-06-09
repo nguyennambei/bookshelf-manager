@@ -1,0 +1,209 @@
+/* --- Thanh điều hướng chuyển trang (Navigation Links) --- */
+.app-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.nav-link {
+    display: inline-block;
+    padding: 6px 18px;
+    border: 2px solid var(--color-border-dark);
+    text-decoration: none;
+    color: var(--color-border-dark);
+    font-weight: bold;
+    background-color: #ffffff;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+}
+
+.nav-link.active, .nav-link:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+}
+
+/* --- Thiết kế Thẻ Fieldset & Legend đặc trưng cổ điển --- */
+fieldset {
+    border: 2px solid var(--color-border-dark);
+    padding: 22px;
+    background-color: #ffffff;
+    /* Hiệu ứng đổ bóng khối phẳng (Hard-shadow) đậm nét Retro cổ cũ */
+    box-shadow: 5px 5px 0px #cbc6b8;
+    margin-bottom: 25px;
+}
+
+legend {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: #ffffff;
+    background-color: var(--color-primary); /* Đỏ điểm nhấn */
+    padding: 4px 14px;
+    border: 1px solid var(--color-border-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Linh kiện Form, Input và Select --- */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group-row {
+    display: flex;
+    gap: 15px;
+}
+
+.flex-1 { flex: 1; }
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid var(--color-border-dark);
+    background-color: #fafafa;
+    font-family: inherit;
+    font-size: 0.95rem;
+    border-radius: 0; /* Ép vuông góc, loại bỏ bo tròn hiện đại */
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #ffffff;
+}
+
+/* --- Hệ thống các Nút bấm (Buttons) --- */
+.btn-submit {
+    width: 100%;
+    padding: 11px;
+    background-color: #ffffff;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+.btn-submit:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.btn-secondary {
+    color: var(--color-border-dark);
+    border-color: var(--color-border-dark);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-border-dark);
+    color: #ffffff;
+}
+
+/* --- Khối Hiển Thị Thống Kê Số Dư --- */
+.account-summary-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.summary-card {
+    flex: 1 1 160px;
+    border: 1px dashed #666666;
+    padding: 12px;
+    background-color: #fdfdfd;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 6px;
+    border: 1px solid var(--color-border-dark);
+}
+.badge-cash { background-color: #e2e3e5; color: #333; }
+.badge-bank { background-color: #d1ecf1; color: #0c5460; }
+.badge-credit { background-color: #f8d7da; color: #721c24; }
+
+.balance-amount {
+    font-size: 1.15rem;
+    font-weight: bold;
+    margin-top: 3px;
+}
+
+/* --- Định dạng Bảng Sổ Kế Toán Cổ Điển --- */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.classic-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.classic-table th, 
+.classic-table td {
+    border: 1px solid #777777;
+    padding: 9px 12px;
+}
+
+.classic-table th {
+    background-color: #e8e4d8;
+    font-weight: bold;
+    text-align: left;
+}
+
+.table-tag {
+    font-size: 0.75rem;
+    padding: 1px 5px;
+    font-weight: bold;
+}
+.table-tag.cash { background-color: #e2e3e5; }
+.table-tag.bank { background-color: var(--color-primary); color: #fff; }
+
+/* --- Thanh Phân Trang Dưới Bảng Dữ Liệu --- */
+.classic-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #777777;
+}
+
+.page-btn {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-dark);
+    text-decoration: none;
+    color: var(--color-border-dark);
+    font-weight: bold;
+    background-color: #ffffff;
+}
+
+.page-btn.active, .page-btn:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+}
+
+.page-dots {
+    padding: 4px;
+    font-weight: bold;
+}

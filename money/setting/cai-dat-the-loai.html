@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài Đặt Thể Loại</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>CẤU HÌNH THỂ LOẠI</h1>
+        <nav class="app-navigation">
+            <a href="../index.html" class="nav-link">Sổ Cái Giao Dịch</a>
+            <a href="cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
+            <a href="cai-dat-the-loai.html" class="nav-link active">Cài Đặt Thể Loại</a>
+        </nav>
+    </header>
+
+    <main class="box_wrap">
+        <div class="flex-container">
+            <div class="flex-col-form">
+                <fieldset>
+                    <legend id="category-form-title">Tạo Thể Loại Con</legend>
+                    <form id="form-category" onsubmit="return false;">
+                        <input type="hidden" id="edit-cat-id" value="">
+                        <div class="form-group">
+                            <label>Nhóm thể loại chính:</label>
+                            <select id="input-cat-main">
+                                <option value="Khoản Chi > Ăn uống">Khoản Chi > Ăn uống</option>
+                                <option value="Khoản Chi > Di chuyển">Khoản Chi > Di chuyển</option>
+                                <option value="Khoản Chi > Nhà cửa & Sinh hoạt">Khoản Chi > Nhà cửa & Sinh hoạt</option>
+                                <option value="Khoản Thu > Thu nhập">Khoản Thu > Thu nhập</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tên tiểu thể loại mới:</label>
+                            <input type="text" id="input-cat-sub" required>
+                        </div>
+                        <button type="submit" id="btn-cat-submit" class="btn-submit">Lưu Thể Loại</button>
+                        <button type="button" id="btn-cat-cancel" class="btn-submit btn-secondary" style="display:none; margin-top:5px;">Hủy Sửa</button>
+                    </form>
+                </fieldset>
+            </div>
+
+            <div class="flex-col-data">
+                <fieldset>
+                    <legend>Danh Sách Thể Loại & Nhánh Phụ</legend>
+                    <div class="table-responsive">
+                        <table class="classic-table">
+                            <thead>
+                                <tr>
+                                    <th>Thể loại chính</th>
+                                    <th>Tiểu thể loại (Nhánh con)</th>
+                                    <th class="text-center" style="width: 120px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-category-body"></tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/category.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => { initCategoryLogic(); });
+    </script>
+</body>
+</html>

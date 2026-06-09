@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manga Manager - Nhập Mới</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Thêm hiệu ứng ẩn/hiện mượt mà cho phần thêm bộ truyện mới */
+        .hidden-fields {
+            display: none;
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,28 +34,92 @@
         </fieldset>
 
         <fieldset class="content-body">
-            <legend>Nhập Tập Mới</legend>
-            <form onsubmit="event.preventDefault(); alert('Đã lưu thành công!');">
+            <legend>Nhập Tập Mới / Thêm Truyện Mới</legend>
+            
+            <form id="manga-form" onsubmit="handleFormSubmit(event)">
+                
                 <div class="form-group">
                     <label>Chọn bộ truyện:</label>
-                    <select>
-                        <option>Thám Tử Lừng Danh Conan</option>
-                        <option>One Piece</option>
-                        <option>Chainsaw Man</option>
+                    <select id="manga-select" onchange="toggleNewMangaFields()" required>
+                        <option value="">-- Chọn bộ truyện --</option>
+                        <option value="Conan">Thám Tử Lừng Danh Conan</option>
+                        <option value="OnePiece">One Piece</option>
+                        <option value="ChainsawMan">Chainsaw Man</option>
+                        <option value="NEW_MANGA" style="font-weight: bold; color: #bf0000;">+ Thêm bộ truyện mới...</option>
                     </select>
                 </div>
+
+                <div id="new-manga-fields" class="hidden-fields">
+                    <div class="form-group">
+                        <label style="color: #bf0000;">Tên bộ truyện mới:</label>
+                        <input type="text" id="new-manga-title" placeholder="Ví dụ: Naruto, Dragon Ball...">
+                    </div>
+                    <div class="form-group">
+                        <label>Nhà xuất bản:</label>
+                        <select id="new-manga-publisher">
+                            <option value="Kim Đồng">NXB Kim Đồng</option>
+                            <option value="Trẻ">NXB Trẻ</option>
+                            <option value="IPM">IPM</option>
+                            <option value="Amak">Amak</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Tập số:</label>
-                    <input type="number" placeholder="Ví dụ: 105" required>
+                    <input type="number" id="volume-number" placeholder="Ví dụ: 1, 2, 105" required min="1">
                 </div>
+
                 <div class="form-group">
                     <label>Giá tiền (đ):</label>
-                    <input type="number" value="30000">
+                    <input type="number" id="volume-price" value="30000" min="0">
                 </div>
-                <button class="btn">Lưu Lại</button>
+
+                <button type="submit" class="btn" style="font-weight: bold;">Lưu Vào Kệ Sách</button>
             </form>
         </fieldset>
     </div>
 
+    <script>
+        // Hàm xử lý ẩn hiện khi người dùng click chọn loại truyện
+        function toggleNewMangaFields() {
+            const selectEl = document.getElementById('manga-select');
+            const hiddenFieldsEl = document.getElementById('new-manga-fields');
+            const newTitleInput = document.getElementById('new-manga-title');
+
+            if (selectEl.value === 'NEW_MANGA') {
+                // Hiện ô nhập truyện mới và bắt buộc điền (required)
+                hiddenFieldsEl.style.display = 'block';
+                newTitleInput.setAttribute('required', 'true');
+            } else {
+                // Ẩn đi và bỏ bắt buộc điền
+                hiddenFieldsEl.style.display = 'none';
+                newTitleInput.removeAttribute('required');
+            }
+        }
+
+        // Hàm xử lý khi bấm nút "Lưu Lại"
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Ngăn trang bị load lại
+
+            const selectValue = document.getElementById('manga-select').value;
+            const volNum = document.getElementById('volume-number').value;
+            const price = document.getElementById('volume-price').value;
+
+            if (selectValue === 'NEW_MANGA') {
+                const newTitle = document.getElementById('new-manga-title').value;
+                const publisher = document.getElementById('new-manga-publisher').value;
+                
+                alert(`[Thành công] Đã tạo bộ truyện mới: "${newTitle}" (${publisher}) và thêm Tập ${volNum} với giá ${price}đ!`);
+            } else {
+                alert(`[Thành công] Đã thêm Tập ${volNum} vào bộ truyện có sẵn với giá ${price}đ!`);
+            }
+
+            // Reset form sau khi thêm xong để người dùng nhập tiếp cuốn khác
+            document.getElementById('manga-form').reset();
+            toggleNewMangaFields(); // Ẩn lại ô nhập truyện mới về mặc định
+        }
+    </script>
 </body>
-</html> 
+</html>

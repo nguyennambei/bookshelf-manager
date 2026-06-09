@@ -1,0 +1,170 @@
+/* --- CSS Gốc của bạn --- */
+.header {
+    width: 100%;
+    margin-bottom: 0;
+    border-bottom: 2px solid #bf0000;
+}
+
+/* menu -button */
+.menu-list a {
+    border: 1px solid #ccc;
+    padding: 3px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #000000;
+    background-color: #ffffff;
+    font-size: 90%;
+    display: inline-block; /* Đảm bảo padding hoạt động chuẩn */
+}
+.menu-list a:hover {
+    color: white;
+    background-color: #999;
+}
+.menu-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.menu-list li {
+    margin: 5px;
+    padding: 0 0 5px 0;
+}
+
+/* menu */
+.box_wrap {
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+    display: -o-flex;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+ 
+.menu-list {
+    width: 350px;
+    align-self: stretch;
+    border-style: groove;
+    margin: 5px 5px;
+    padding: 10px;
+}
+
+.menu-list legend {
+    font-weight: bold;
+}
+
+/* --- CSS Bổ sung để giao diện cân đối (Không phá vỡ style cũ) --- */
+body {
+    font-family: Arial, sans-serif;
+    margin: 10px;
+    padding: 0;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.header h1 {
+    margin: 10px 0;
+    color: #bf0000;
+}
+
+.content-body {
+    flex: 1;
+    min-width: 300px;
+    border-style: groove;
+    margin: 5px 5px;
+    padding: 15px;
+    align-self: stretch;
+}
+
+/* Các View ẩn/hiện */
+.view-section {
+    display: none;
+}
+.view-section.active {
+    display: block;
+}
+
+/* Thống kê & Form & Bảng */
+.stats-box {
+    margin-bottom: 15px;
+    font-size: 95%;
+}
+.search-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 4px;
+    margin-top: 5px;
+}
+.manga-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.manga-table th, .manga-table td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+}
+.manga-table th {
+    background-color: #f2f2f2;
+}
+.volume-item {
+    display: inline-block;
+    border: 1px solid #aaa;
+    background: #eee;
+    padding: 3px 8px;
+    margin: 3px;
+    font-size: 90%;
+    border-radius: 3px;
+}
+.form-group {
+    margin-bottom: 10px;
+}
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+.form-group input, .form-group select {
+    padding: 4px;
+    width: 100%;
+    max-width: 300px;
+}
+.btn {
+    padding: 5px 15px;
+    background: #f2f2f2;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+.btn:hover {
+    background: #ddd;
+}
+
+/* Khung chứa lưới các tập truyện */
+.volume-grid {
+    display: grid;
+    /* Tự động chia các cột, mỗi cột rộng tối thiểu 70px và tối đa đều nhau */
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
+    gap: 10px; /* Khoảng cách giữa các ô truyện */
+    margin-top: 15px;
+}
+
+/* Định dạng lại từng ô tập truyện cho cân đối */
+.volume-item-box {
+    border: 1px solid #aaa;
+    background: #f9f9f9;
+    padding: 10px 5px;
+    font-size: 90%;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Hiệu ứng rê chuột vào ô tập truyện nhìn cho trực quan */
+.volume-item-box:hover {
+    border-color: #bf0000;
+    background-color: #fff1f1;
+    color: #bf0000;
+}

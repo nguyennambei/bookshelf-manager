@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Manager - Chi Tiết</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>📚 MangaShelf Manager</h1>
+    </div>
+
+    <div class="box_wrap">
+        <fieldset class="menu-list">
+            <legend>Menu Chức Năng</legend>
+            <ul>
+                <li><a href="index.html">🏠 Trang Chủ (Dashboard)</a></li>
+                <li><a href="tong-truyen.html">📖 Tổng Kho Truyện</a></li>
+                <li><a href="nhap-moi.html">➕ Nhập Tập Mới</a></li>
+            </ul>
+        </fieldset>
+
+        <fieldset class="content-body">
+            <legend>Kiểm Tra Bản Ghi Tập Truyện</legend>
+            <a href="tong-truyen.html" style="color: blue; font-size: 90%;">← Quay lại danh sách tổng</a>
+            
+            <h3 id="manga-title" style="margin: 10px 0 5px 0;">Bộ truyện: Loading...</h3>
+            <p style="font-size: 90%; color: #555; margin-bottom: 10px;">Các tập đã mua để tránh trùng:</p>
+            
+            <div id="volume-grid" class="volume-grid">
+                </div>
+        </fieldset>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const manga = urlParams.get('manga') || 'Conan';
+        
+        const titleEl = document.getElementById('manga-title');
+        const gridEl = document.getElementById('volume-grid'); // Thay đổi biến hứng theo ID mới
+        
+        let volumes = [];
+        if (manga === 'Conan') {
+            titleEl.innerText = "Bộ truyện: Thám Tử Lừng Danh Conan";
+            // Thêm nhiều tập hơn để test giao diện lưới (Grid) nhìn cho rõ
+            volumes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 50, 100, 101, 102];
+        } else if (manga === 'OnePiece') {
+            titleEl.innerText = "Bộ truyện: One Piece";
+            volumes = [1, 2, 3, 4, 5, 6, 7, 99, 100, 101, 102, 103, 104];
+        } else {
+            titleEl.innerText = "Bộ truyện: Chainsaw Man";
+            volumes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        }
+
+        volumes.forEach(vol => {
+            const div = document.createElement('div');
+            // ĐỔI SANG CLASS MỚI ĐỂ HIỂN THỊ DẠNG Ô CÂN ĐỐI
+            div.className = 'volume-item-box'; 
+            div.innerText = `${vol}`; // Chỉ để số tập (ví dụ: 1, 2, 3) cho ô lưới gọn gàng
+            gridEl.appendChild(div);
+        });
+    </script>
+</body>
+</html>

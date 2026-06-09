@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Manager - Tổng Kho Truyện</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>📚 MangaShelf Manager</h1>
+    </div>
+
+    <div class="box_wrap">
+        <fieldset class="menu-list">
+            <legend>Menu Chức Năng</legend>
+            <ul>
+                <li><a href="index.html">🏠 Trang Chủ (Dashboard)</a></li>
+                <li><a href="tong-truyen.html" style="background-color: #999; color: white;">📖 Tổng Kho Truyện</a></li>
+                <li><a href="nhap-moi.html">➕ Nhập Tập Mới</a></li>
+            </ul>
+        </fieldset>
+
+        <fieldset class="content-body">
+            <legend>Tổng Kho Truyện</legend>
+            <p style="font-size: 90%; color: #555;">Danh sách các bộ truyện hiện có trên kệ (Bấm vào tên để xem chi tiết tập):</p>
+            <table class="manga-table">
+                <thead>
+                    <tr>
+                        <th>Tên bộ truyện</th>
+                        <th>Nhà xuất bản</th>
+                        <th>Số tập đã có</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="chi-tiet.html?manga=Conan" style="color: #bf0000; font-weight: bold;">Thám Tử Lừng Danh Conan</a></td>
+                        <td>Kim Đồng</td>
+                        <td>101 tập</td>
+                    </tr>
+                    <tr>
+                        <td><a href="chi-tiet.html?manga=OnePiece" style="color: #bf0000; font-weight: bold;">One Piece</a></td>
+                        <td>Kim Đồng</td>
+                        <td>104 tập</td>
+                    </tr>
+                    <tr>
+                        <td><a href="chi-tiet.html?manga=ChainsawMan" style="color: #bf0000; font-weight: bold;">Chainsaw Man</a></td>
+                        <td>Trẻ</td>
+                        <td>11 tập</td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+
+</body>
+</html>

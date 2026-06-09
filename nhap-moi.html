@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Manager - Nhập Mới</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>📚 MangaShelf Manager</h1>
+    </div>
+
+    <div class="box_wrap">
+        <fieldset class="menu-list">
+            <legend>Menu Chức Năng</legend>
+            <ul>
+                <li><a href="index.html">🏠 Trang Chủ (Dashboard)</a></li>
+                <li><a href="tong-truyen.html">📖 Tổng Kho Truyện</a></li>
+                <li><a href="nhap-moi.html" style="background-color: #999; color: white;">➕ Nhập Tập Mới</a></li>
+            </ul>
+        </fieldset>
+
+        <fieldset class="content-body">
+            <legend>Nhập Tập Mới</legend>
+            <form onsubmit="event.preventDefault(); alert('Đã lưu thành công!');">
+                <div class="form-group">
+                    <label>Chọn bộ truyện:</label>
+                    <select>
+                        <option>Thám Tử Lừng Danh Conan</option>
+                        <option>One Piece</option>
+                        <option>Chainsaw Man</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tập số:</label>
+                    <input type="number" placeholder="Ví dụ: 105" required>
+                </div>
+                <div class="form-group">
+                    <label>Giá tiền (đ):</label>
+                    <input type="number" value="30000">
+                </div>
+                <button class="btn">Lưu Lại</button>
+            </form>
+        </fieldset>
+    </div>
+
+</body>
+</html> 

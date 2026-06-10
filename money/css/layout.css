@@ -33,3 +33,37 @@
 .page-section.active-section {
     display: block; /* Chỉ hiển thị phần được chọn */
 }
+
+/* Khối bọc 2 bộ lọc nằm phía trên bảng */
+.table-filter-container {
+  display: flex;
+  gap: 15px; /* Khoảng cách giữa bộ lọc Tháng và Hiển thị */
+  align-items: center;
+  margin-bottom: 12px; /* Tạo khoảng cách thông thoáng với bảng ngay dưới */
+  padding: 5px 0;
+}
+
+/* Kiểu dáng nhãn chữ "Tháng:" và "Hiển thị:" */
+.table-filter-limit {
+  font-size: 12px;
+  font-weight: normal;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Ép các ô input/select thu nhỏ, không bị chiếm hết chiều ngang */
+.table-filter-limit .select-limit {
+  padding: 3px 8px;
+  width: auto;
+  margin: 0;
+  height: auto;
+  font-size: 12px;
+}
+
+/* Thanh phân trang ở góc dưới bên phải */
+.classic-pagination {
+  margin-top: 15px;
+  text-align: right;
+}

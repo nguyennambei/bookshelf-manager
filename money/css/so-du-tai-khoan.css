@@ -1,0 +1,70 @@
+/* css/so-du-tai-khoan.css */
+
+.wallet-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.total-summary-box {
+    background: #2c3e50;
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-summary-box h2 { 
+    margin: 0; 
+    font-size: 16px; 
+    font-weight: normal; 
+    color: #bdc3c7; 
+}
+
+.total-summary-box .amount { 
+    font-size: 28px; 
+    font-weight: 700; 
+    color: #2ecc71; 
+}
+
+.grid-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .grid-two-columns { grid-template-columns: 1fr; }
+}
+
+.account-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.account-item-row:last-child { border-bottom: none; }
+
+.account-info-meta { display: flex; flex-direction: column; gap: 4px; }
+.account-title { font-weight: 600; color: #2c3e50; font-size: 14px; }
+
+/* Định dạng badge cho ví */
+.badge-type { 
+    display: inline-block; 
+    font-size: 10px; 
+    padding: 1px 6px; 
+    border-radius: 4px; 
+    width: max-content; 
+}
+.bg-cash { background: #fef3c7; color: #d97706; }
+.bg-bank { background: #e0f2fe; color: #0284c7; }
+.bg-credit { background: #fce7f3; color: #db2777; }

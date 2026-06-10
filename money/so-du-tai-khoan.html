@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Số Dư Tài Khoản Thực Tế</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/so-du-tai-khoan.css">
+</head>
+<body>
+<header class="app-header">
+    <h1>SỔ THU CHI CỔ ĐIỂN</h1>
+    <nav class="app-navigation">
+      <a href="index.html" class="nav-link">Nhật Ký Giao Dịch</a>
+      <a href="so-du-tai-khoan.html" class="nav-link active">Số Dư Hiện Tại</a>
+      <a href="bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
+      <a href="setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
+      <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
+    </nav>
+  </header>
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div class="total-summary-box">
+      <div>
+        <h2>TỔNG TÀI SẢN THỰC TẾ HỆ THỐNG</h2>
+        <small style="color: #95a5a6;">(Tổng số dư khả dụng từ tất cả các ví/tài khoản đang hoạt động)</small>
+      </div>
+      <div class="amount" id="txt-total-all-wallets">0 ₫</div>
+    </div>
+
+    <div class="wallet-dashboard">
+      <div class="grid-two-columns">
+        
+        <div class="flex-col-form">
+          <fieldset class="category-fieldset">
+            <legend id="form-balance-title">Điều Chỉnh Số Dư Ví / Tài Khoản</legend>
+            <form id="form-adjust-balance">
+              <div class="form-group">
+                <label class="form-label">Chọn tài khoản/ví cần chỉnh:</label>
+                <select id="select-balance-method" class="form-select" required>
+                  </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Số tiền mới (hoặc số tiền nạp):</label>
+                <input type="text" id="input-balance-amount" class="form-input" placeholder="Nhập số tiền..." required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Ghi chú lý do lý giải:</label>
+                <textarea id="input-balance-note" class="form-input" rows="3" placeholder="Ví dụ: Nạp tiền đầu tháng, kiểm kê quỹ tiền mặt lệch,..." required></textarea>
+              </div>
+
+              <div style="text-align: right; margin-top: 15px;">
+                <button type="submit" id="btn-submit-balance" class="btn-submit">Cập Nhật Số Dư</button>
+              </div>
+            </form>
+          </fieldset>
+        </div>
+
+        <div class="flex-col-data">
+          <fieldset class="category-fieldset">
+            <legend>Chi Tiết Số Dư Từng Nguồn Tiền</legend>
+            <div id="list-account-balances-detail" style="min-height: 100px;">
+              </div>
+          </fieldset>
+          
+          <fieldset class="category-fieldset" style="margin-top: 20px;">
+            <legend>Nhật Ký Biến Động Số Dư Gần Đây</legend>
+            <div class="table-responsive">
+              <table class="classic-table">
+                <thead>
+                  <tr>
+                    <th style="width: 90px;">Ngày</th>
+                    <th>Tài khoản</th>
+                    <th>Nội dung biến động / Lý do</th>
+                    <th style="text-align: right; width: 120px;">Số tiền sau chỉnh</th>
+                  </tr>
+                </thead>
+                <tbody id="table-balance-history-body">
+                  </tbody>
+              </table>
+            </div>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/so-du-tai-khoan.js"></script>
+</body>
+</html>

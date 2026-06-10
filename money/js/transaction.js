@@ -23,16 +23,22 @@ let transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [
     { id: "tx_sample_2", type: "INCOME", amount: 12000000, main_category_id: "cat_3", sub_category_name: "Lương chính thức", method_id: "pm_2", date: "2026-06-05", note: "Tinh tinh lương tháng", status: "ACTIVE" }
 ];
 
-// Cấu hình phân trang mặc định cho Sổ cái
+// Cấu hình phân trang & Bộ lọc thời gian mặc định
 let currentPage = 1;
 let rowsPerPage = 5;
+let currentFilterMonth = ""; // Lưu chuỗi định dạng: "YYYY-MM"
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Lưu ngược lại LocalStorage nếu máy khách trống dữ liệu mẫu ban đầu
     if (!localStorage.getItem("classic_categories")) localStorage.setItem("classic_categories", JSON.stringify(categories));
     if (!localStorage.getItem("classic_payment_categories")) localStorage.setItem("classic_payment_categories", JSON.stringify(paymentCategories));
     if (!localStorage.getItem("classic_payment_methods")) localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));
     if (!localStorage.getItem("classic_transactions")) localStorage.setItem("classic_transactions", JSON.stringify(transactions));
+
+    // Khởi tạo tháng mặc định tự động lấy Tháng/Năm hiện hành của hệ thống
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    currentFilterMonth = `${currentYear}-${currentMonth}`;
 
     initTransactionFormLogic();
 });
@@ -50,46 +56,51 @@ function initTransactionFormLogic() {
     const mainCatSelect = document.getElementById("input-tx-cat-main");
     const subCatSelect = document.getElementById("input-tx-cat-sub");
     const methodSelect = document.getElementById("input-tx-method");
-    const amountInput = document.getElementById("input-tx-amount"); // Ô nhập số tiền dạng chuỗi định dạng
-    const rowsSelect = document.getElementById("select-rows-per-page"); // Bộ chọn giới hạn dòng hiển thị
+    const amountInput = document.getElementById("input-tx-amount"); 
+    const rowsSelect = document.getElementById("select-rows-per-page"); 
+    const monthFilterInput = document.getElementById("select-filter-month"); 
     const btnSubmit = document.getElementById("btn-submit-transaction");
     const btnCancel = document.getElementById("btn-tx-cancel");
 
     if (!typeSelect || !mainCatSelect || !subCatSelect || !methodSelect || !amountInput) return;
 
-    // Ép hiển thị đồng bộ dữ liệu lên giao diện lúc vừa nạp trang
     renderTxMethodOptions(methodSelect);
     renderTxMainCatOptions(typeSelect.value, mainCatSelect);
     renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
+
+    if (monthFilterInput) {
+        monthFilterInput.value = currentFilterMonth; 
+        monthFilterInput.onchange = function() {
+            currentFilterMonth = this.value;
+            currentPage = 1; 
+            renderTransactionTable();
+        };
+    }
+
+    if (rowsSelect) {
+        rowsSelect.value = rowsPerPage; 
+        rowsSelect.onchange = function() {
+            rowsPerPage = parseInt(this.value, 10);
+            currentPage = 1; 
+            renderTransactionTable();
+        };
+    }
+
     renderTransactionTable();
 
-    // --- SỰ KIỆN 1: TỰ ĐỘNG CHÈN DẤU CHẤM PHÂN CÁCH KHI GÕ SỐ TIỀN ---
     amountInput.oninput = function() {
         formatCurrencyInput(this);
     };
 
-    // --- SỰ KIỆN 2: THAY ĐỔI CHI/THU -> LỌC LẠI DANH MỤC CHÍNH & CON ---
     typeSelect.onchange = function() {
         renderTxMainCatOptions(this.value, mainCatSelect);
         renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
     };
 
-    // --- SỰ KIỆN 3: THAY ĐỔI MỤC CHÍNH -> LỌC CÁC MỤC CON TƯƠNG ỨNG ---
     mainCatSelect.onchange = function() {
         renderTxSubCatOptions(this.value, subCatSelect);
     };
 
-    // --- SỰ KIỆN 4: THAY ĐỔI SỐ LƯỢNG DÒNG HIỂN THỊ TRÊN MỘT TRANG ---
-    if (rowsSelect) {
-        rowsSelect.value = rowsPerPage; // Đồng bộ trạng thái giao diện với giá trị logic
-        rowsSelect.onchange = function() {
-            rowsPerPage = parseInt(this.value, 10);
-            currentPage = 1; // Đưa về trang đầu tiên để tránh lỗi hiển thị lệch trang
-            renderTransactionTable();
-        };
-    }
-
-    // --- SỰ KIỆN 5: LƯU MỚI HOẶC CẬP NHẬT GIAO DỊCH VÀO SỔ CÁI ---
     if (btnSubmit) {
         btnSubmit.onclick = null;
         btnSubmit.onclick = function(e) {
@@ -97,8 +108,6 @@ function initTransactionFormLogic() {
 
             const editId = document.getElementById("edit-tx-id").value;
             const type = typeSelect.value;
-            
-            // Chuyển đổi dữ liệu: Xóa bỏ các dấu chấm phân cách trước khi ép kiểu số thực
             const rawAmount = amountInput.value.replace(/\./g, "");
             const amount = parseFloat(rawAmount) || 0;
 
@@ -113,26 +122,21 @@ function initTransactionFormLogic() {
             if (!mainCatId || !subCatName) { alert("Vui lòng thiết lập cấu hình thể loại trước!"); return; }
 
             if (editId) {
-                // Sửa: Thực hiện hoàn trả lại dòng tiền cũ trong ví thanh toán trước
                 const oldTx = transactions.find(t => t.id === editId);
                 if (oldTx) revertWalletBalance(oldTx.method_id, oldTx.type, oldTx.amount);
 
-                // Ghi đè dữ liệu mới
                 transactions = transactions.map(t => 
                     t.id === editId ? { ...t, type, amount, main_category_id: mainCatId, sub_category_name: subCatName, method_id: methodId, date: txDate, note, updateDate: nowIso } : t
                 );
                 applyWalletBalance(methodId, type, amount);
             } else {
-                // Thêm mới: Đẩy giao dịch mới nhất lên vị trí đầu mảng
                 transactions.unshift({ id: "tx_" + Date.now(), type, amount, main_category_id: mainCatId, sub_category_name: subCatName, method_id: methodId, date: txDate, note, createDate: nowIso, updateDate: nowIso, status: "ACTIVE" });
                 applyWalletBalance(methodId, type, amount);
             }
 
-            // Đồng bộ dữ liệu xuống bộ nhớ máy khách
             localStorage.setItem("classic_transactions", JSON.stringify(transactions));
             localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));
 
-            // Đưa toàn bộ form về trạng thái trống ban đầu
             document.getElementById("form-transaction").reset();
             document.getElementById("edit-tx-id").value = "";
             document.getElementById("transaction-form-title").textContent = "Ghi Chép Giao Dịch Mới";
@@ -194,31 +198,48 @@ function renderTxSubCatOptions(mainCatId, selectEl) {
 }
 
 // =========================================================================
-// 4. KHỞI TẠO BẢNG SỔ CÁI VÀ LOGIC PHÂN TRANG ĐỘNG
+// 4. KHỞI TẠO BẢNG SỔ CÁI VÀ LOGIC SẮP XẾP NGÀY + PHÂN TRANG
 // =========================================================================
 function renderTransactionTable() {
     const tbody = document.getElementById("table-transaction-body");
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    const activeTx = transactions.filter(t => t.status !== "DELETED");
+    // Bước A: Lọc bỏ các dòng bị xóa mềm
+    let filteredTx = transactions.filter(t => t.status !== "DELETED");
 
-    if (activeTx.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #95a5a6; padding: 20px;">Sổ cái chưa ghi nhận giao dịch nào.</td></tr>`;
+    // Bước B: Áp dụng bộ lọc Tháng (So khớp chuỗi YYYY-MM)
+    if (currentFilterMonth) {
+        filteredTx = filteredTx.filter(t => {
+            return t.date && t.date.startsWith(currentFilterMonth);
+        });
+    }
+
+    if (filteredTx.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #95a5a6; padding: 20px;">Không tìm thấy dữ liệu nhật ký chi tiêu cho tháng được chọn.</td></tr>`;
+        renderPaginationControls(0);
         return;
     }
 
-    // Thực hiện cắt mảng dữ liệu phục vụ hiển thị theo trang cụ thể
+    // --- BƯỚC CẢI TIẾN: SẮP XẾP NGÀY MỚI NHẤT LÊN ĐẦU TIÊN ---
+    // So sánh chuỗi ngày dạng "YYYY-MM-DD". Trả về kết quả đảo ngược để ngày lớn hơn lên trước.
+    filteredTx.sort((a, b) => {
+        if (a.date < b.date) return 1;
+        if (a.date > b.date) return -1;
+        return 0;
+    });
+
+    // Bước D: Tính toán chỉ mục phân trang dựa trên danh sách đã sắp xếp ngày
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    const paginatedTx = activeTx.slice(startIndex, endIndex);
+    const paginatedTx = filteredTx.slice(startIndex, endIndex);
 
     paginatedTx.forEach(t => {
         const tr = document.createElement("tr");
         
         const methodObj = paymentMethods.find(m => m.id === t.method_id);
         const methodName = methodObj ? methodObj.name : "Không rõ";
-        const methodCode =  methodObj ? methodObj.category_code : "undefined";
+        const methodCode = methodObj ? methodObj.category_code : "undefined";
 
         const mainCatObj = categories.find(c => c.id === t.main_category_id);
         const mainCatName = mainCatObj ? mainCatObj.name : "Không rõ";
@@ -233,7 +254,7 @@ function renderTransactionTable() {
             <td><strong>${mainCatName}</strong> <small style="color:#7f8c8d; display:block;">(${t.sub_category_name})</small></td>
             <td><span style="color:#57606f; font-size:13px;">${t.note || '---'}</span></td>
             <td style="text-align: right; font-weight: 700; ${colorStyle}">${prefixSign}${formattedAmount}</td>
-            <td class="text-center" style="white-space: nowrap;" >
+            <td class="text-center" style="white-space: nowrap;">
                 <button class="btn-action edit" onclick="editTransaction('${t.id}')">Sửa</button>
                 <button class="btn-action delete" onclick="deleteTransaction('${t.id}')">Xóa</button>
             </td>
@@ -241,7 +262,7 @@ function renderTransactionTable() {
         tbody.appendChild(tr);
     });
 
-    renderPaginationControls(activeTx.length);
+    renderPaginationControls(filteredTx.length);
 }
 
 function renderPaginationControls(totalItems) {
@@ -250,9 +271,8 @@ function renderPaginationControls(totalItems) {
     pContainer.innerHTML = "";
 
     const totalPages = Math.ceil(totalItems / rowsPerPage);
-    if (totalPages <= 1) return; // Nếu tổng dữ liệu nằm vừa trong 1 trang thì ẩn thanh phân trang
+    if (totalPages <= 1) return; 
 
-    // Nút tắt quay lại trang trước (Previous)
     const btnPrev = document.createElement("button");
     btnPrev.textContent = "«";
     btnPrev.className = "btn-page-nav";
@@ -262,7 +282,6 @@ function renderPaginationControls(totalItems) {
     btnPrev.onclick = () => { if (currentPage > 1) { currentPage--; renderTransactionTable(); } };
     pContainer.appendChild(btnPrev);
 
-    // Vòng lặp in các nút số trang cụ thể
     for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
@@ -285,7 +304,6 @@ function renderPaginationControls(totalItems) {
         pContainer.appendChild(btn);
     }
 
-    // Nút tắt tiến đến trang sau (Next)
     const btnNext = document.createElement("button");
     btnNext.textContent = "»";
     btnNext.className = "btn-page-nav";
@@ -306,7 +324,6 @@ window.editTransaction = function(id) {
     document.getElementById("edit-tx-id").value = t.id;
     document.getElementById("input-tx-type").value = t.type;
     
-    // Đổ số tiền lên trường nhập và ép hiển thị dấu chấm phân tách ngay lập tức
     const amountInput = document.getElementById("input-tx-amount");
     amountInput.value = new Intl.NumberFormat("vi-VN").format(t.amount);
     

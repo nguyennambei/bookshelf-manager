@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthInput = document.getElementById("report-month");
     const now = new Date();
     monthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    
+
     renderReport(monthInput.value);
     monthInput.onchange = (e) => renderReport(e.target.value);
 });
@@ -14,10 +14,10 @@ function renderReport(month) {
     const transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [];
     const categories = JSON.parse(localStorage.getItem("classic_categories")) || [];
     const filtered = transactions.filter(t => t.date.startsWith(month) && t.status !== "DELETED");
-    
+
     let totalIncome = 0, totalExpense = 0, categoryMap = {};
     let daysInMonth = new Date(month.split('-')[0], month.split('-')[1], 0).getDate();
-    let labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
+    let labels = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     let incomeData = new Array(daysInMonth).fill(0);
     let expenseData = new Array(daysInMonth).fill(0);
 
@@ -62,6 +62,10 @@ function renderReport(month) {
         data: { labels: labels, datasets: [{ label: 'Chi tiêu', data: expenseData, backgroundColor: '#c0392b' }] },
         options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
+
+    // 2. VẼ LỊCH CHI TIÊU
+    const [year, monthIndex] = month.split('-').map(Number);
+    renderExpenseCalendar(daysInMonth, incomeData, expenseData, year, monthIndex - 1);
 }
 
 function formatVND(n) {
@@ -70,16 +74,48 @@ function formatVND(n) {
 
 function exportToPDF() {
     const element = document.getElementById('report-content');
-    
+
     // Cấu hình định dạng file PDF
     const opt = {
-        margin:       0.5,
-        filename:     `Bao-Cao-Tai-Chinh-${document.getElementById('report-month').value}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        margin: 0.5,
+        filename: `Bao-Cao-Tai-Chinh-${document.getElementById('report-month').value}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
     // Chuyển đổi và tải xuống
     html2pdf().set(opt).from(element).save();
+}
+
+function renderExpenseCalendar(daysInMonth, incomeData, expenseData, year, monthIndex) {
+    const calendarEl = document.getElementById("expense-calendar");
+    calendarEl.innerHTML = "";
+
+    // 1. Thêm hàng tiêu đề thứ
+    const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    daysOfWeek.forEach(day => {
+        calendarEl.innerHTML += `<div class="cal-header">${day}</div>`;
+    });
+
+    // 2. Tính xem ngày 1 của tháng rơi vào thứ mấy để đẩy khoảng trống
+    const firstDay = new Date(year, monthIndex, 1).getDay();
+    for (let j = 0; j < firstDay; j++) {
+        calendarEl.innerHTML += `<div class="cal-day"></div>`;
+    }
+
+    // 3. Render các ngày trong tháng
+    for (let i = 1; i <= daysInMonth; i++) {
+        const income = incomeData[i - 1];
+        const expense = expenseData[i - 1];
+
+        const dayDiv = document.createElement("div");
+        dayDiv.className = "cal-day";
+        dayDiv.innerHTML = `
+            <span class="cal-day-num">${i}</span>
+            ${income > 0 ? `<span class="cal-day-income">+${Math.round(income / 1000)}k</span>` : ''}
+            ${expense > 0 ? `<span class="cal-day-expense">-${Math.round(expense / 1000)}k</span>` : ''}
+        `;
+        calendarEl.appendChild(dayDiv);
+    }
 }

@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Báo Cáo Thống Kê Theo Tháng</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/components.css">
-    
+    <title>Báo Cáo Tài Chính Tháng</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/report.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body>
 
+<body>
     <header class="app-header">
-        <h1>BÁO CÁO TÀI CHÍNH THÁNG</h1>
+        <h1>SỔ THU CHI CỔ ĐIỂN</h1>
         <nav class="app-navigation">
             <a href="index.html" class="nav-link">Nhật Ký Giao Dịch</a>
             <a href="so-du-tai-khoan.html" class="nav-link">Số Dư Hiện Tại</a>
@@ -22,72 +23,57 @@
             <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
         </nav>
     </header>
+    <div class="container" id="report-content" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+        <h2 style="margin: 20px 0;">Báo Cáo Tài Chính</h2>
 
-    <main class="box_wrap">
-        <fieldset style="margin-bottom: 20px;">
-            <legend>Bộ Lọc Báo Cáo</legend>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <label>Xem dữ liệu tháng:</label>
-                <input type="month" id="report-month-picker" style="padding: 5px; font-family: inherit;">
+        <div class="report-card">
+            <div>
+                <label>Chọn tháng báo cáo:</label>
+                <input type="month" id="report-month" class="form-select" style="width: 200px;">
             </div>
-        </fieldset>
+            <button onclick="exportToPDF()" class="btn-submit" style="background: #e74c3c;">Tải xuống Báo cáo
+                (PDF)</button>
+        </div>
 
-        <div class="account-summary-grid" style="margin-bottom: 25px;">
-            <div class="summary-card" style="border-left: 4px solid green;">
-                <span class="badge badge-bank">Tổng Thu Nhập</span>
-                <h4 style="margin: 5px 0;">Tháng này</h4>
-                <p class="balance-amount txt-green" id="report-total-income">0đ</p>
+        <div class="stat-grid">
+            <div class="stat-item bg-income">Tổng thu: <div id="total-income"
+                    style="font-size: 20px; font-weight: bold;">0 ₫</div>
             </div>
-            <div class="summary-card" style="border-left: 4px solid var(--color-primary);">
-                <span class="badge badge-credit">Tổng Chi Tiêu</span>
-                <h4 style="margin: 5px 0;">Tháng này</h4>
-                <p class="balance-amount txt-red" id="report-total-expense">0đ</p>
+            <div class="stat-item bg-expense">Tổng chi: <div id="total-expense"
+                    style="font-size: 20px; font-weight: bold;">0 ₫</div>
             </div>
-            <div class="summary-card" style="border-left: 4px solid #333;">
-                <span class="badge badge-cash">Còn Lại (Tích Lũy)</span>
-                <h4 style="margin: 5px 0;">Chênh lệch</h4>
-                <p class="balance-amount" id="report-net-savings">0đ</p>
+            <div class="stat-item bg-balance">Số dư: <div id="net-balance" style="font-size: 20px; font-weight: bold;">0
+                    ₫</div>
             </div>
         </div>
 
-        <div class="flex-container" style="gap: 20px;">
-            <div class="flex-col-form" style="flex: 1 1 40%; max-width: 100%;">
-                <fieldset>
-                    <legend>Biểu Đồ Cơ Cấu Chi Tiêu (%)</legend>
-                    <div style="max-width: 320px; margin: 0 auto; padding: 10px 0;">
-                        <canvas id="expensePieChart"></canvas>
-                    </div>
-                </fieldset>
-            </div>
-
-            <div class="flex-col-data" style="flex: 1 1 60%;">
-                <fieldset style="height: 100%;">
-                    <legend>Cơ Cấu Chi Tiêu & Thu Nhập Chi Tiết</legend>
-                    <div class="table-responsive">
-                        <table class="classic-table">
-                            <thead>
-                                <tr>
-                                    <th>Hạng mục</th>
-                                    <th>Loại</th>
-                                    <th class="text-right">Tổng số tiền</th>
-                                    <th class="text-right" style="width: 100px;">Tỷ trọng</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-report-body"></tbody>
-                        </table>
-                    </div>
-                </fieldset>
+        <div class="report-card">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+                <div>
+                    <legend>Biểu đồ Thu nhập (Trend)</legend>
+                    <canvas id="incomeChart"></canvas>
+                </div>
+                <div>
+                    <legend>Biểu đồ Chi tiêu (Daily)</legend>
+                    <canvas id="expenseChart"></canvas>
+                </div>
             </div>
         </div>
-    </main>
 
-    <script src="../js/account.js"></script>
-    <script src="../js/category.js"></script>
-    <script src="../js/transaction.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if(typeof initMonthlyReportLogic === "function") initMonthlyReportLogic();
-        });
-    </script>
+        <div class="report-card">
+            <legend>Phân tích theo Danh Mục</legend>
+            <table class="classic-table">
+                <thead>
+                    <tr>
+                        <th>Danh mục</th>
+                        <th style="text-align: right;">Số tiền</th>
+                    </tr>
+                </thead>
+                <tbody id="report-category-body"></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="js/bao-cao-thang.js"></script>
 </body>
+
 </html>

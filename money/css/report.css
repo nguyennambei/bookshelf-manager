@@ -1,0 +1,11 @@
+/* css/report.css */
+.report-card { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+.stat-item { padding: 15px; border-radius: 6px; text-align: center; color: #fff; }
+.bg-income { background: #27ae60; }
+.bg-expense { background: #c0392b; }
+.bg-balance { background: #2980b9; }
+
+@media (max-width: 768px) {
+    .stat-grid { grid-template-columns: 1fr; }
+}

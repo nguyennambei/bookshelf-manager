@@ -1,14 +1,3 @@
-let paymentCategories = JSON.parse(localStorage.getItem("classic_payment_categories")) || [
-    { id: "p_cat_1", code: "CASH", name: "Tiền mặt", createDate: "2026-06-01T00:00:00.000Z", updateDate: "2026-06-01T00:00:00.000Z", status: "ACTIVE" },
-    { id: "p_cat_2", code: "BANK", name: "Tài khoản ngân hàng", createDate: "2026-06-01T00:00:00.000Z", updateDate: "2026-06-01T00:00:00.000Z", status: "ACTIVE" },
-    { id: "p_cat_3", code: "CREDIT", name: "Thẻ tín dụng", createDate: "2026-06-01T00:00:00.000Z", updateDate: "2026-06-01T00:00:00.000Z", status: "ACTIVE" }
-];
-
-let paymentMethods = JSON.parse(localStorage.getItem("classic_payment_methods")) || [
-    { id: "pm_1", name: "Tiền mặt ví chính", balance: 500000, category_code: "CASH", createDate: "2026-06-01T00:00:00.000Z", updateDate: "2026-06-01T00:00:00.000Z", status: "ACTIVE" },
-    { id: "pm_2", name: "Vietcombank", balance: 15000000, category_code: "BANK", createDate: "2026-06-01T00:00:00.000Z", updateDate: "2026-06-01T00:00:00.000Z", status: "ACTIVE" }
-];
-
 document.addEventListener("DOMContentLoaded", () => {
     initAccountLogic();
 });
@@ -47,6 +36,8 @@ function initAccountLogic() {
             const categoryCode = document.getElementById("select-account-category").value;
             const balance = parseFloat(document.getElementById("input-account-balance").value) || 0;
             const nowIso = new Date().toISOString();
+            const methodObj = paymentCategories.find(m => m.code === categoryCode);
+            const methodDisplay =  methodObj ? methodObj.display : "undefined";
 
             if (!name) { alert("Vui lòng nhập tên ví!"); return; }
 
@@ -54,7 +45,7 @@ function initAccountLogic() {
                 paymentMethods = paymentMethods.map(pm => pm.id === editId ? { ...pm, name, category_code: categoryCode, balance, updateDate: nowIso } : pm);
                 resetAccountForm();
             } else {
-                paymentMethods.push({ id: "pm_" + Date.now(), name, balance, category_code: categoryCode, createDate: nowIso, updateDate: nowIso, status: "ACTIVE" });
+                paymentMethods.push({ id: "pm_" + Date.now(), name, balance, category_code: categoryCode, createDate: nowIso, updateDate: nowIso, display: methodDisplay, status: "ACTIVE" });
                 resetAccountForm();
             }
             localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));

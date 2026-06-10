@@ -8,13 +8,13 @@ let categories = JSON.parse(localStorage.getItem("classic_categories")) || [
 ];
 
 let paymentCategories = JSON.parse(localStorage.getItem("classic_payment_categories")) || [
-    { id: "p_cat_1", code: "CASH", name: "Tiền mặt", status: "ACTIVE" },
-    { id: "p_cat_2", code: "BANK", name: "Tài khoản ngân hàng", status: "ACTIVE" }
+    { id: "p_cat_1", code: "CASH", name: "Tiền mặt", display: 'badge-cash' , status: "ACTIVE" },
+    { id: "p_cat_2", code: "BANK", name: "Tài khoản ngân hàng", display: 'badge-bank' , status: "ACTIVE" }
 ];
 
 let paymentMethods = JSON.parse(localStorage.getItem("classic_payment_methods")) || [
-    { id: "pm_1", name: "Tiền mặt ví chính", balance: 2000000, category_code: "CASH", status: "ACTIVE" },
-    { id: "pm_2", name: "Vietcombank", balance: 15000000, category_code: "BANK", status: "ACTIVE" }
+    { id: "pm_1", name: "Tiền mặt ví chính", balance: 2000000, category_code: "CASH", status: "ACTIVE", display: 'badge-cash' },
+    { id: "pm_2", name: "Vietcombank", balance: 15000000, category_code: "BANK", status: "ACTIVE", display: 'badge-bank'  }
 ];
 
 let transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [
@@ -217,6 +217,7 @@ function renderTransactionTable() {
         
         const methodObj = paymentMethods.find(m => m.id === t.method_id);
         const methodName = methodObj ? methodObj.name : "Không rõ";
+        const methodDisplay =  methodObj ? methodObj.display : "undefined";
 
         const mainCatObj = categories.find(c => c.id === t.main_category_id);
         const mainCatName = mainCatObj ? mainCatObj.name : "Không rõ";
@@ -227,7 +228,7 @@ function renderTransactionTable() {
 
         tr.innerHTML = `
             <td>${t.date}</td>
-            <td><span class="account-badge badge-bank" style="font-size:11px; padding:2px 5px; background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; border-radius:4px;">${methodName}</span></td>
+            <td><span class="account-badge ${methodDisplay}">${methodName}</span></td>
             <td><strong>${mainCatName}</strong> <small style="color:#7f8c8d; display:block;">(${t.sub_category_name})</small></td>
             <td><span style="color:#57606f; font-size:13px;">${t.note || '---'}</span></td>
             <td style="text-align: right; font-weight: 700; ${colorStyle}">${prefixSign}${formattedAmount}</td>

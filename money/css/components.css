@@ -207,3 +207,204 @@ input:focus, select:focus {
     padding: 4px;
     font-weight: bold;
 }
+
+.btn-action {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: 4px; /* Bo góc nhẹ hiện đại */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 0 2px;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+/* Kiểu dáng riêng cho nút [SỬA] - Tông màu xanh dương dịu mắt */
+.btn-action.edit {
+    color: #2980b9;
+    background-color: #e8f4f8;
+    border-color: #d4e6f1;
+}
+
+/* Hiệu ứng khi di chuột vào nút Sửa */
+.btn-action.edit:hover {
+    color: #ffffff;
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+/* Kiểu dáng riêng cho nút [XÓA] - Tông màu đỏ nhạt pastel */
+.btn-action.delete {
+    color: #c0392b;
+    background-color: #fce4d6;
+    border-color: #fadbd8;
+}
+
+/* Hiệu ứng khi di chuột vào nút Xóa */
+.btn-action.delete:hover {
+    color: #ffffff;
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+/* Hiệu ứng tạo chiều sâu khi bấm đè chuột xuống (Click giữ chân) */
+.btn-action:active {
+    transform: scale(0.95);
+}
+
+/* Đảm bảo căn chỉnh các nút trong ô cột Thao tác luôn nằm thẳng hàng */
+.classic-table td class="text-center" {
+    white-space: nowrap;
+}
+
+/* =========================================================================
+   STYLE ĐẶC THÙ CHO TRANG CÀI ĐẶT THỂ LOẠI (CATEGORY SETTING)
+   ========================================================================= */
+
+.category-fieldset {
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 15px 20px; 
+  background: #fff;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group-sub {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #34495e;
+}
+
+.form-select, .form-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Thanh thêm tag hàng ngang */
+.input-tag-row {
+  display: flex; 
+  gap: 8px; 
+  margin-bottom: 10px;
+}
+
+.sub-input-field {
+  flex: 1;
+}
+
+.btn-plus {
+  padding: 0 18px;
+  font-weight: bold;
+  font-size: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Khung hiển thị danh sách tag */
+.tags-output-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px;
+  background: #fafafa;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
+  min-height: 45px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Khối nút bấm dưới form */
+.form-btn-group {
+  display: flex; 
+  gap: 10px;
+}
+
+.btn-submit {
+  flex: 1; 
+  padding: 10px; 
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  padding: 0 20px;
+  margin: 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Định dạng chiều rộng cột thao tác trên bảng */
+.th-action {
+  width: 110px;
+}
+
+/* Badge phân loại nhóm tài khoản trên bảng dữ liệu */
+.account-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.badge-cash {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fcd34d;
+}
+.badge-bank {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #7dd3fc;
+}
+.badge-credit {
+  background-color: #fce7f3;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
+}
+/* =========================================================================
+   STYLE CHO HỘP THOẠI MODAL POP-UP (NHÓM TÀI KHOẢN)
+   ========================================================================= */
+.custom-modal {
+  display: none; 
+  position: fixed; 
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.5); 
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 500px; 
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  animation: animatetop 0.3s;
+}
+
+@keyframes animatetop {
+  from { top: -200px; opacity: 0; }
+  to { top: 0; opacity: 1; }
+}

@@ -30,8 +30,10 @@
       <div class="flex-container">
         <div class="flex-col-form">
           <fieldset>
-            <legend>Ghi Chép Giao Dịch</legend>
-            <form onsubmit="return false;">
+            <legend id="transaction-form-title">Ghi Chép Giao Dịch</legend>
+            <form id="form-transaction" onsubmit="return false;">
+              <input type="hidden" id="edit-tx-id" value="" />
+
               <div class="form-group">
                 <label>Loại giao dịch:</label>
                 <select id="tx-type">
@@ -54,19 +56,35 @@
                   required
                 />
               </div>
+
               <div class="form-group">
                 <label>Số tiền (VNĐ):</label>
-                <input type="number" id="tx-amount" placeholder="0" required />
+                <input type="text" id="tx-amount" placeholder="0" required />
               </div>
+
               <div class="form-group">
                 <label>Tài khoản thanh toán:</label>
                 <select id="tx-account"></select>
               </div>
+
               <div class="form-group">
                 <label>Thể loại > Kiểu con:</label>
                 <select id="tx-category"></select>
               </div>
-              <button type="submit" class="btn-submit">Ghi Vào Sổ Cái</button>
+
+              <div class="form-btn-group" style="display: flex; gap: 10px">
+                <button type="submit" class="btn-submit" style="flex: 1">
+                  Ghi Vào Sổ Cái
+                </button>
+                <button
+                  type="button"
+                  id="btn-tx-cancel"
+                  class="btn-action delete"
+                  style="display: none; padding: 0 15px"
+                >
+                  Hủy
+                </button>
+              </div>
             </form>
           </fieldset>
         </div>
@@ -78,11 +96,12 @@
               <table class="classic-table">
                 <thead>
                   <tr>
-                    <th style="width: 100px">Ngày</th>
-                    <th style="width: 120px">Tài khoản</th>
-                    <th style="width: 150px">Danh mục</th>
+                    <th style="width: 90px">Ngày</th>
+                    <th style="width: 110px">Tài khoản</th>
+                    <th style="width: 130px">Danh mục</th>
                     <th>Nội dung</th>
-                    <th class="text-right" style="width: 110px">Số tiền</th>
+                    <th class="text-right" style="width: 100px">Số tiền</th>
+                    <th class="text-center" style="width: 90px">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="table-transaction-body"></tbody>

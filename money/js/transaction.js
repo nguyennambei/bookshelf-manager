@@ -1,232 +1,374 @@
-// Dữ liệu giao dịch gốc
-let transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [
-    { id: "tx_mock_1", date: "2026-06-05", accountId: "acc_2", categoryId: "cat_8", title: "Nhận lương công ty tháng 05", amount: 18500000, type: "income" },
-    { id: "tx_mock_2", date: "2026-06-08", accountId: "acc_2", categoryId: "cat_9", title: "Thanh toán dự án Freelance Web", amount: 4500000, type: "income" },
-    { id: "tx_mock_3", date: "2026-06-01", accountId: "acc_3", categoryId: "cat_5", title: "Hóa đơn tiền điện sinh hoạt gia đình", amount: 1350000, type: "expense" },
-    { id: "tx_mock_4", date: "2026-06-02", accountId: "acc_2", categoryId: "cat_6", title: "Cước Internet cáp quang Viettel", amount: 275000, type: "expense" },
-    { id: "tx_mock_5", date: "2026-06-02", accountId: "acc_1", categoryId: "cat_7", title: "Tiền nước & Phí quản lý chung cư", amount: 480000, type: "expense" },
-    { id: "tx_mock_6", date: "2026-06-09", accountId: "acc_1", categoryId: "cat_1", title: "Ăn trưa bún đậu mắm tôm cùng công ty", amount: 55000, type: "expense" },
-    { id: "tx_mock_7", date: "2026-06-08", accountId: "acc_1", categoryId: "cat_2", title: "Cà phê Starbucks tiếp khách hàng", amount: 115000, type: "expense" },
-    { id: "tx_mock_8", date: "2026-06-07", accountId: "acc_2", categoryId: "cat_3", title: "Đổ đầy bình xăng xe máy", amount: 80000, type: "expense" },
-    { id: "tx_mock_9", date: "2026-06-06", accountId: "acc_1", categoryId: "cat_1", title: "Mua đồ ăn tối tại siêu thị WinMart", amount: 320000, type: "expense" }
+// =========================================================================
+// 1. KHỞI TẠO DỮ LIỆU ĐỒNG BỘ LOCALSTORAGE (CÓ SẴN DATA MẪU TRỰC QUAN)
+// =========================================================================
+let categories = JSON.parse(localStorage.getItem("classic_categories")) || [
+    { id: "cat_1", name: "Ăn uống", type: "EXPENSE", subCategories: ["Ăn sáng", "Ăn trưa", "Cà phê & Hẹn hò"], status: "ACTIVE" },
+    { id: "cat_2", name: "Di chuyển", type: "EXPENSE", subCategories: ["Xăng xe", "Sửa xe & Bảo dưỡng"], status: "ACTIVE" },
+    { id: "cat_3", name: "Tiền lương", type: "INCOME", subCategories: ["Lương chính thức", "Thưởng & Freelance"], status: "ACTIVE" }
 ];
 
-const rowsPerPage = 5;
+let paymentCategories = JSON.parse(localStorage.getItem("classic_payment_categories")) || [
+    { id: "p_cat_1", code: "CASH", name: "Tiền mặt", status: "ACTIVE" },
+    { id: "p_cat_2", code: "BANK", name: "Tài khoản ngân hàng", status: "ACTIVE" }
+];
+
+let paymentMethods = JSON.parse(localStorage.getItem("classic_payment_methods")) || [
+    { id: "pm_1", name: "Tiền mặt ví chính", balance: 2000000, category_code: "CASH", status: "ACTIVE" },
+    { id: "pm_2", name: "Vietcombank", balance: 15000000, category_code: "BANK", status: "ACTIVE" }
+];
+
+let transactions = JSON.parse(localStorage.getItem("classic_transactions")) || [
+    { id: "tx_sample_1", type: "EXPENSE", amount: 45000, main_category_id: "cat_1", sub_category_name: "Ăn sáng", method_id: "pm_1", date: "2026-06-10", note: "Bát phở bò nóng", status: "ACTIVE" },
+    { id: "tx_sample_2", type: "INCOME", amount: 12000000, main_category_id: "cat_3", sub_category_name: "Lương chính thức", method_id: "pm_2", date: "2026-06-05", note: "Tinh tinh lương tháng", status: "ACTIVE" }
+];
+
+// Cấu hình phân trang mặc định cho Sổ cái
 let currentPage = 1;
+let rowsPerPage = 5;
 
-function initTransactionLogic() {
-    if (!localStorage.getItem("classic_transactions") || JSON.parse(localStorage.getItem("classic_transactions")).length === 0) {
-        localStorage.setItem("classic_transactions", JSON.stringify(transactions));
-    } else {
-        transactions = JSON.parse(localStorage.getItem("classic_transactions"));
+document.addEventListener("DOMContentLoaded", () => {
+    // Lưu ngược lại LocalStorage nếu máy khách trống dữ liệu mẫu ban đầu
+    if (!localStorage.getItem("classic_categories")) localStorage.setItem("classic_categories", JSON.stringify(categories));
+    if (!localStorage.getItem("classic_payment_categories")) localStorage.setItem("classic_payment_categories", JSON.stringify(paymentCategories));
+    if (!localStorage.getItem("classic_payment_methods")) localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));
+    if (!localStorage.getItem("classic_transactions")) localStorage.setItem("classic_transactions", JSON.stringify(transactions));
+
+    initTransactionFormLogic();
+});
+
+// =========================================================================
+// 2. ĐIỀU KHIỂN BIẾN ĐỘNG FORM & SỰ KIỆN LỒNG NHAU
+// =========================================================================
+function initTransactionFormLogic() {
+    const dateField = document.getElementById("input-tx-date");
+    if (dateField && !dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
     }
 
-    const dateInput = document.getElementById("tx-date");
-    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    const typeSelect = document.getElementById("input-tx-type");
+    const mainCatSelect = document.getElementById("input-tx-cat-main");
+    const subCatSelect = document.getElementById("input-tx-cat-sub");
+    const methodSelect = document.getElementById("input-tx-method");
+    const amountInput = document.getElementById("input-tx-amount"); // Ô nhập số tiền dạng chuỗi định dạng
+    const rowsSelect = document.getElementById("select-rows-per-page"); // Bộ chọn giới hạn dòng hiển thị
+    const btnSubmit = document.getElementById("btn-submit-transaction");
+    const btnCancel = document.getElementById("btn-tx-cancel");
 
-    // --- 1. TỰ ĐỘNG PHÂN TÁCH DẤU CHẤM KHI GÕ SỐ TIỀN ---
-    const amountInput = document.getElementById("tx-amount");
-    if (amountInput) {
-        amountInput.addEventListener("input", (e) => {
-            // Chỉ lấy các ký tự số
-            let value = e.target.value.replace(/\D/g, "");
-            if (value) {
-                // Định dạng hiển thị thành chuỗi có dấu chấm
-                e.target.value = new Intl.NumberFormat('vi-VN').format(value);
-            } else {
-                e.target.value = "";
-            }
-        });
+    if (!typeSelect || !mainCatSelect || !subCatSelect || !methodSelect || !amountInput) return;
+
+    // Ép hiển thị đồng bộ dữ liệu lên giao diện lúc vừa nạp trang
+    renderTxMethodOptions(methodSelect);
+    renderTxMainCatOptions(typeSelect.value, mainCatSelect);
+    renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
+    renderTransactionTable();
+
+    // --- SỰ KIỆN 1: TỰ ĐỘNG CHÈN DẤU CHẤM PHÂN CÁCH KHI GÕ SỐ TIỀN ---
+    amountInput.oninput = function() {
+        formatCurrencyInput(this);
+    };
+
+    // --- SỰ KIỆN 2: THAY ĐỔI CHI/THU -> LỌC LẠI DANH MỤC CHÍNH & CON ---
+    typeSelect.onchange = function() {
+        renderTxMainCatOptions(this.value, mainCatSelect);
+        renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
+    };
+
+    // --- SỰ KIỆN 3: THAY ĐỔI MỤC CHÍNH -> LỌC CÁC MỤC CON TƯƠNG ỨNG ---
+    mainCatSelect.onchange = function() {
+        renderTxSubCatOptions(this.value, subCatSelect);
+    };
+
+    // --- SỰ KIỆN 4: THAY ĐỔI SỐ LƯỢNG DÒNG HIỂN THỊ TRÊN MỘT TRANG ---
+    if (rowsSelect) {
+        rowsSelect.value = rowsPerPage; // Đồng bộ trạng thái giao diện với giá trị logic
+        rowsSelect.onchange = function() {
+            rowsPerPage = parseInt(this.value, 10);
+            currentPage = 1; // Đưa về trang đầu tiên để tránh lỗi hiển thị lệch trang
+            renderTransactionTable();
+        };
     }
 
-    // --- 2. XỬ LÝ SỰ KIỆN SUBMIT FORM (THÊM HOẶC SỬA) ---
-    const form = document.getElementById("form-transaction");
-    const cancelBtn = document.getElementById("btn-tx-cancel");
-
-    if (form) {
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
+    // --- SỰ KIỆN 5: LƯU MỚI HOẶC CẬP NHẬT GIAO DỊCH VÀO SỔ CÁI ---
+    if (btnSubmit) {
+        btnSubmit.onclick = null;
+        btnSubmit.onclick = function(e) {
+            if (e) e.preventDefault();
 
             const editId = document.getElementById("edit-tx-id").value;
-            const selectedDate = document.getElementById("tx-date").value;
-            const title = document.getElementById("tx-title").value.trim();
-            // Lấy giá trị số thuần túy bằng cách bỏ hết dấu chấm phân cách đi trước khi ép kiểu
-            const amount = parseFloat(document.getElementById("tx-amount").value.replace(/\./g, "")) || 0;
-            const accountId = document.getElementById("tx-account").value;
-            const categoryId = document.getElementById("tx-category").value;
-            const type = document.getElementById("tx-type").value;
+            const type = typeSelect.value;
+            
+            // Chuyển đổi dữ liệu: Xóa bỏ các dấu chấm phân cách trước khi ép kiểu số thực
+            const rawAmount = amountInput.value.replace(/\./g, "");
+            const amount = parseFloat(rawAmount) || 0;
 
-            if (amount <= 0) {
-                alert("Vui lòng nhập số tiền lớn hơn 0!");
-                return;
-            }
+            const mainCatId = mainCatSelect.value;
+            const subCatName = subCatSelect.value;
+            const methodId = methodSelect.value;
+            const txDate = dateField.value;
+            const note = document.getElementById("input-tx-note").value.trim();
+            const nowIso = new Date().toISOString();
+
+            if (amount <= 0) { alert("Vui lòng nhập số tiền lớn hơn 0!"); return; }
+            if (!mainCatId || !subCatName) { alert("Vui lòng thiết lập cấu hình thể loại trước!"); return; }
 
             if (editId) {
-                // Chế độ: CẬP NHẬT GIAO DỊCH CŨ
-                transactions = transactions.map(tx => 
-                    tx.id === editId ? { ...tx, date: selectedDate, accountId, categoryId, title, amount, type } : tx
+                // Sửa: Thực hiện hoàn trả lại dòng tiền cũ trong ví thanh toán trước
+                const oldTx = transactions.find(t => t.id === editId);
+                if (oldTx) revertWalletBalance(oldTx.method_id, oldTx.type, oldTx.amount);
+
+                // Ghi đè dữ liệu mới
+                transactions = transactions.map(t => 
+                    t.id === editId ? { ...t, type, amount, main_category_id: mainCatId, sub_category_name: subCatName, method_id: methodId, date: txDate, note, updateDate: nowIso } : t
                 );
-                document.getElementById("edit-tx-id").value = "";
-                document.getElementById("transaction-form-title").textContent = "Ghi Chép Giao Dịch";
-                if (cancelBtn) cancelBtn.style.display = "none";
+                applyWalletBalance(methodId, type, amount);
             } else {
-                // Chế độ: THÊM MỚI GIAO DỊCH
-                const newTx = { id: "tx_" + Date.now(), date: selectedDate, accountId, categoryId, title, amount, type };
-                transactions.unshift(newTx);
+                // Thêm mới: Đẩy giao dịch mới nhất lên vị trí đầu mảng
+                transactions.unshift({ id: "tx_" + Date.now(), type, amount, main_category_id: mainCatId, sub_category_name: subCatName, method_id: methodId, date: txDate, note, createDate: nowIso, updateDate: nowIso, status: "ACTIVE" });
+                applyWalletBalance(methodId, type, amount);
             }
 
-            // Đồng bộ sắp xếp và lưu trữ
-            transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-            saveTransactions();
-            
-            form.reset();
-            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-        });
-    }
+            // Đồng bộ dữ liệu xuống bộ nhớ máy khách
+            localStorage.setItem("classic_transactions", JSON.stringify(transactions));
+            localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));
 
-    // Nút hủy chế độ sửa
-    if (cancelBtn) {
-        cancelBtn.addEventListener("click", () => {
+            // Đưa toàn bộ form về trạng thái trống ban đầu
+            document.getElementById("form-transaction").reset();
             document.getElementById("edit-tx-id").value = "";
-            document.getElementById("transaction-form-title").textContent = "Ghi Chép Giao Dịch";
-            cancelBtn.style.display = "none";
-            form.reset();
-            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-        });
+            document.getElementById("transaction-form-title").textContent = "Ghi Chép Giao Dịch Mới";
+            if (btnCancel) btnCancel.style.display = "none";
+            dateField.value = new Date().toISOString().split('T')[0];
+
+            renderTxMainCatOptions(typeSelect.value, mainCatSelect);
+            renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
+            renderTransactionTable();
+            alert("Đã ghi sổ cái giao dịch và cập nhật số dư thành công!");
+        };
     }
 
-    calculateLiveBalances();
-    renderTransactionTable();
+    if (btnCancel) {
+        btnCancel.onclick = function() {
+            document.getElementById("edit-tx-id").value = "";
+            document.getElementById("transaction-form-title").textContent = "Ghi Chép Giao Dịch Mới";
+            this.style.display = "none";
+            document.getElementById("form-transaction").reset();
+            dateField.value = new Date().toISOString().split('T')[0];
+            renderTxMainCatOptions(typeSelect.value, mainCatSelect);
+            renderTxSubCatOptions(mainCatSelect.value, subCatSelect);
+        };
+    }
 }
 
-function saveTransactions() {
-    localStorage.setItem("classic_transactions", JSON.stringify(transactions));
-    calculateLiveBalances();
-    renderTransactionTable();
+// =========================================================================
+// 3. ĐỔ DỮ LIỆU ĐỘNG VÀO CÁC Ô CHỌN SELECT BOX
+// =========================================================================
+function renderTxMethodOptions(selectEl) {
+    if (!selectEl) return;
+    const activeMethods = paymentMethods.filter(pm => pm.status !== "DELETED");
+    selectEl.innerHTML = "";
+    activeMethods.forEach(pm => {
+        selectEl.innerHTML += `<option value="${pm.id}">${pm.name}</option>`;
+    });
 }
 
-// --- 3. VẼ BẢNG NHẬT KÝ VÀ TÍCH HỢP NÚT SỬA / XÓA ---
+function renderTxMainCatOptions(type, selectEl) {
+    if (!selectEl) return;
+    const filtered = categories.filter(c => c.type === type && c.status !== "DELETED");
+    selectEl.innerHTML = "";
+    filtered.forEach(c => {
+        selectEl.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+    });
+}
+
+function renderTxSubCatOptions(mainCatId, selectEl) {
+    if (!selectEl) return;
+    selectEl.innerHTML = "";
+    const catObj = categories.find(c => c.id === mainCatId);
+    if (catObj && catObj.subCategories && catObj.subCategories.length > 0) {
+        catObj.subCategories.forEach(sub => {
+            selectEl.innerHTML += `<option value="${sub}">${sub}</option>`;
+        });
+    } else {
+        selectEl.innerHTML += `<option value="Khác">Khác</option>`;
+    }
+}
+
+// =========================================================================
+// 4. KHỞI TẠO BẢNG SỔ CÁI VÀ LOGIC PHÂN TRANG ĐỘNG
+// =========================================================================
 function renderTransactionTable() {
     const tbody = document.getElementById("table-transaction-body");
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    const localTx = JSON.parse(localStorage.getItem("classic_transactions")) || transactions;
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const paginatedItems = localTx.slice(start, end);
+    const activeTx = transactions.filter(t => t.status !== "DELETED");
 
-    const localAccs = JSON.parse(localStorage.getItem("classic_accounts")) || [];
-    const localCats = JSON.parse(localStorage.getItem("classic_categories")) || [];
+    if (activeTx.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #95a5a6; padding: 20px;">Sổ cái chưa ghi nhận giao dịch nào.</td></tr>`;
+        return;
+    }
 
-    paginatedItems.forEach(tx => {
+    // Thực hiện cắt mảng dữ liệu phục vụ hiển thị theo trang cụ thể
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedTx = activeTx.slice(startIndex, endIndex);
+
+    paginatedTx.forEach(t => {
         const tr = document.createElement("tr");
+        
+        const methodObj = paymentMethods.find(m => m.id === t.method_id);
+        const methodName = methodObj ? methodObj.name : "Không rõ";
 
-        const acc = localAccs.find(a => a.id === tx.accountId) || { name: "N/A", type: "cash" };
-        const cat = localCats.find(c => c.id === tx.categoryId) || { main: "", sub: "Chưa phân loại" };
-        const cleanMain = cat.main.replace("Khoản Chi > ", "").replace("Khoản Thu > ", "");
+        const mainCatObj = categories.find(c => c.id === t.main_category_id);
+        const mainCatName = mainCatObj ? mainCatObj.name : "Không rõ";
 
-        const formattedAmount = new Intl.NumberFormat('vi-VN').format(tx.amount) + "đ";
-        const sign = tx.type === "expense" ? "-" : "+";
-        const colorClass = tx.type === "expense" ? "txt-red" : "txt-green";
-        const tagClass = acc.type === "cash" ? "cash" : "bank";
-
-        const [year, month, day] = tx.date.split("-");
-        const formattedDate = `${day}/${month}/${year}`;
+        const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(t.amount);
+        const colorStyle = t.type === "EXPENSE" ? "color: #c0392b;" : "color: #27ae60;";
+        const prefixSign = t.type === "EXPENSE" ? "-" : "+";
 
         tr.innerHTML = `
-            <td>${formattedDate}</td>
-            <td><span class="table-tag ${tagClass}">${acc.name}</span></td>
-            <td>${cleanMain ? cleanMain + " > " : ""}${cat.sub}</td>
-            <td>${tx.title}</td>
-            <td class="text-right ${colorClass}" style="font-weight:bold;">${sign}${formattedAmount}</td>
+            <td>${t.date}</td>
+            <td><span class="account-badge badge-bank" style="font-size:11px; padding:2px 5px; background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; border-radius:4px;">${methodName}</span></td>
+            <td><strong>${mainCatName}</strong> <small style="color:#7f8c8d; display:block;">(${t.sub_category_name})</small></td>
+            <td><span style="color:#57606f; font-size:13px;">${t.note || '---'}</span></td>
+            <td style="text-align: right; font-weight: 700; ${colorStyle}">${prefixSign}${formattedAmount}</td>
             <td class="text-center">
-                <button class="btn-action edit" onclick="editTransaction('${tx.id}')" style="padding:2px 6px; font-size:11px;">Sửa</button>
-                <button class="btn-action delete" onclick="deleteTransaction('${tx.id}')" style="padding:2px 6px; font-size:11px;">Xóa</button>
+                <button class="btn-action edit" onclick="editTransaction('${t.id}')">Sửa</button>
+                <button class="btn-action delete" onclick="deleteTransaction('${t.id}')">Xóa</button>
             </td>
         `;
         tbody.appendChild(tr);
     });
 
-    renderPaginationControls(localTx.length);
-}
-
-// --- 4. LOGIC XỬ LÝ KHI BẤM NÚT SỬA GIAO DỊCH ---
-function editTransaction(id) {
-    const tx = transactions.find(t => t.id === id);
-    if (!tx) return;
-
-    // Đổ dữ liệu ngược lại lên form
-    document.getElementById("edit-tx-id").value = tx.id;
-    document.getElementById("tx-type").value = tx.type;
-    document.getElementById("tx-date").value = tx.date;
-    document.getElementById("tx-title").value = tx.title;
-    // Đổ số tiền kèm định dạng dấu chấm
-    document.getElementById("tx-amount").value = new Intl.NumberFormat('vi-VN').format(tx.amount);
-    document.getElementById("tx-account").value = tx.accountId;
-    document.getElementById("tx-category").value = tx.categoryId;
-
-    // Thay đổi tiêu đề form để người dùng nhận biết
-    document.getElementById("transaction-form-title").textContent = "Sửa Giao Dịch Sổ Cái";
-    
-    const cancelBtn = document.getElementById("btn-tx-cancel");
-    if (cancelBtn) cancelBtn.style.display = "inline-block";
-    
-    // Cuộn màn hình lên đầu (Hữu ích khi dùng trên điện thoại)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// --- 5. LOGIC XỬ LÝ KHI BẤM NÚT XÓA GIAO DỊCH ---
-function deleteTransaction(id) {
-    if (confirm("Bạn có chắc chắn muốn xóa dòng giao dịch này? Số dư ví tiền mặt/tài khoản ngân hàng liên quan sẽ tự động tính toán lại.")) {
-        transactions = transactions.filter(t => t.id !== id);
-        saveTransactions();
-    }
-}
-
-// Các hàm tính số dư `calculateLiveBalances()` và phân trang `renderPaginationControls()` giữ nguyên giống hệt lượt chat trước...
-function calculateLiveBalances() {
-    const gridContainer = document.querySelector(".account-summary-grid");
-    if (!gridContainer) return;
-    let baseAccounts = JSON.parse(localStorage.getItem("classic_accounts")) || [];
-    let liveBalances = {};
-    baseAccounts.forEach(acc => { liveBalances[acc.id] = acc.balance; });
-    const allTx = JSON.parse(localStorage.getItem("classic_transactions")) || transactions;
-    allTx.forEach(tx => {
-        if (liveBalances[tx.accountId] !== undefined) {
-            if (tx.type === "expense") liveBalances[tx.accountId] -= tx.amount;
-            else liveBalances[tx.accountId] += tx.amount;
-        }
-    });
-    gridContainer.innerHTML = "";
-    baseAccounts.forEach(acc => {
-        const currentBal = liveBalances[acc.id];
-        const card = document.createElement("div");
-        card.className = "summary-card";
-        const formatted = new Intl.NumberFormat('vi-VN').format(currentBal) + "đ";
-        let badgeClass = acc.type === "cash" ? "badge-cash" : (acc.type === "bank" ? "badge-bank" : "badge-credit");
-        let badgeText = acc.type === "cash" ? "Tiền mặt" : (acc.type === "bank" ? "Ngân hàng" : "Tín dụng");
-        card.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span><h4 style="margin: 10px 0 5px 0;">${acc.name}</h4><p class="balance-amount ${currentBal < 0 ? 'txt-red' : ''}">${formatted}</p>`;
-        gridContainer.appendChild(card);
-    });
+    renderPaginationControls(activeTx.length);
 }
 
 function renderPaginationControls(totalItems) {
-    const paginationContainer = document.querySelector(".classic-pagination");
-    if (!paginationContainer) return;
-    paginationContainer.innerHTML = "";
-    const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
-    const prevBtn = document.createElement("a"); prevBtn.href = "#"; prevBtn.className = "page-btn"; prevBtn.textContent = "« Trước";
-    if (currentPage === 1) prevBtn.style.opacity = "0.4";
-    prevBtn.addEventListener("click", (e) => { e.preventDefault(); if (currentPage > 1) { currentPage--; renderTransactionTable(); } });
-    paginationContainer.appendChild(prevBtn);
+    const pContainer = document.getElementById("tx-pagination");
+    if (!pContainer) return;
+    pContainer.innerHTML = "";
+
+    const totalPages = Math.ceil(totalItems / rowsPerPage);
+    if (totalPages <= 1) return; // Nếu tổng dữ liệu nằm vừa trong 1 trang thì ẩn thanh phân trang
+
+    // Nút tắt quay lại trang trước (Previous)
+    const btnPrev = document.createElement("button");
+    btnPrev.textContent = "«";
+    btnPrev.className = "btn-page-nav";
+    btnPrev.disabled = currentPage === 1;
+    btnPrev.style.margin = "0 3px";
+    btnPrev.style.padding = "3px 8px";
+    btnPrev.onclick = () => { if (currentPage > 1) { currentPage--; renderTransactionTable(); } };
+    pContainer.appendChild(btnPrev);
+
+    // Vòng lặp in các nút số trang cụ thể
     for (let i = 1; i <= totalPages; i++) {
-        const pageBtn = document.createElement("a"); pageBtn.href = "#"; pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`; pageBtn.textContent = i;
-        pageBtn.addEventListener("click", (e) => { e.preventDefault(); currentPage = i; renderTransactionTable(); });
-        paginationContainer.appendChild(pageBtn);
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.style.margin = "0 3px";
+        btn.style.padding = "3px 8px";
+        btn.style.cursor = "pointer";
+        
+        if (i === currentPage) {
+            btn.style.background = "#2c3e50";
+            btn.style.color = "#fff";
+            btn.style.fontWeight = "bold";
+            btn.style.border = "1px solid #2c3e50";
+        } else {
+            btn.style.background = "#fff";
+            btn.style.color = "#333";
+            btn.style.border = "1px solid #ccc";
+        }
+        
+        btn.onclick = () => { currentPage = i; renderTransactionTable(); };
+        pContainer.appendChild(btn);
     }
-    const nextBtn = document.createElement("a"); nextBtn.href = "#"; nextBtn.className = "page-btn"; nextBtn.textContent = "Sau »";
-    if (currentPage === totalPages) nextBtn.style.opacity = "0.4";
-    nextBtn.addEventListener("click", (e) => { e.preventDefault(); if (currentPage < totalPages) { currentPage++; renderTransactionTable(); } });
-    paginationContainer.appendChild(nextBtn);
+
+    // Nút tắt tiến đến trang sau (Next)
+    const btnNext = document.createElement("button");
+    btnNext.textContent = "»";
+    btnNext.className = "btn-page-nav";
+    btnNext.disabled = currentPage === totalPages;
+    btnNext.style.margin = "0 3px";
+    btnNext.style.padding = "3px 8px";
+    btnNext.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTransactionTable(); } };
+    pContainer.appendChild(btnNext);
+}
+
+// =========================================================================
+// 5. THAO TÁC HÀM SỬA / XÓA LÊN TOÀN CỤC CỬA SỔ WINDOW
+// =========================================================================
+window.editTransaction = function(id) {
+    const t = transactions.find(tx => tx.id === id);
+    if (!t) return;
+
+    document.getElementById("edit-tx-id").value = t.id;
+    document.getElementById("input-tx-type").value = t.type;
+    
+    // Đổ số tiền lên trường nhập và ép hiển thị dấu chấm phân tách ngay lập tức
+    const amountInput = document.getElementById("input-tx-amount");
+    amountInput.value = new Intl.NumberFormat("vi-VN").format(t.amount);
+    
+    const mainCatSelect = document.getElementById("input-tx-cat-main");
+    const subCatSelect = document.getElementById("input-tx-cat-sub");
+    
+    renderTxMainCatOptions(t.type, mainCatSelect);
+    mainCatSelect.value = t.main_category_id;
+    
+    renderTxSubCatOptions(t.main_category_id, subCatSelect);
+    subCatSelect.value = t.sub_category_name;
+
+    document.getElementById("input-tx-method").value = t.method_id;
+    document.getElementById("input-tx-date").value = t.date;
+    document.getElementById("input-tx-note").value = t.note;
+
+    document.getElementById("transaction-form-title").textContent = "Sửa Giao Dịch Sổ Cái";
+    document.getElementById("btn-tx-cancel").style.display = "inline-block";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.deleteTransaction = function(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa giao dịch này? Số dư tài khoản ví liên quan sẽ tự động hoàn tác tăng/giảm tương ứng.")) {
+        const t = transactions.find(tx => tx.id === id);
+        if (t) {
+            revertWalletBalance(t.method_id, t.type, t.amount);
+            transactions = transactions.filter(tx => tx.id !== id);
+            
+            localStorage.setItem("classic_transactions", JSON.stringify(transactions));
+            localStorage.setItem("classic_payment_methods", JSON.stringify(paymentMethods));
+            
+            renderTransactionTable();
+        }
+    }
+};
+
+// =========================================================================
+// 6. TIỆN ÍCH CHÈN ĐỊNH DẠNG CHUỖI TIỀN TỆ & BIẾN ĐỘNG SỐ DƯ VÍ
+// =========================================================================
+function formatCurrencyInput(inputEl) {
+    let value = inputEl.value.replace(/\D/g, "");
+    if (!value) {
+        inputEl.value = "";
+        return;
+    }
+    inputEl.value = new Intl.NumberFormat("vi-VN").format(parseInt(value, 10));
+}
+
+function applyWalletBalance(methodId, type, amount) {
+    paymentMethods = paymentMethods.map(pm => {
+        if (pm.id === methodId) {
+            const newBalance = type === "EXPENSE" ? (pm.balance - amount) : (pm.balance + amount);
+            return { ...pm, balance: newBalance };
+        }
+        return pm;
+    });
+}
+
+function revertWalletBalance(methodId, type, amount) {
+    paymentMethods = paymentMethods.map(pm => {
+        if (pm.id === methodId) {
+            const newBalance = type === "EXPENSE" ? (pm.balance + amount) : (pm.balance - amount);
+            return { ...pm, balance: newBalance };
+        }
+        return pm;
+    });
 }

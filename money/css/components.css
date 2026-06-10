@@ -408,3 +408,22 @@ input:focus, select:focus {
   from { top: -200px; opacity: 0; }
   to { top: 0; opacity: 1; }
 }
+
+/* Bộ chọn số lượng dòng hiển thị trên trang chủ */
+.table-filter-limit {
+  font-size: 12px;
+  font-weight: normal;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Tùy biến select box thu nhỏ nằm trên thanh tiêu đề */
+.table-filter-limit .select-limit {
+  padding: 2px 8px;
+  width: auto;
+  margin: 0;
+  height: auto;
+  font-size: 12px;
+}

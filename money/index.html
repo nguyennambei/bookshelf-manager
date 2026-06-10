@@ -29,58 +29,91 @@
     <main class="box_wrap">
       <div class="flex-container">
         <div class="flex-col-form">
-          <fieldset>
-            <legend id="transaction-form-title">Ghi Chép Giao Dịch</legend>
+          <fieldset class="transaction-fieldset">
+            <legend id="transaction-form-title">Ghi Chép Giao Dịch Mới</legend>
             <form id="form-transaction" onsubmit="return false;">
               <input type="hidden" id="edit-tx-id" value="" />
 
               <div class="form-group">
-                <label>Loại giao dịch:</label>
-                <select id="tx-type">
-                  <option value="expense">Chi ra (-)</option>
-                  <option value="income">Thu vào (+)</option>
+                <label class="form-label">Loại giao dịch:</label>
+                <select id="input-tx-type" class="form-select" required>
+                  <option value="EXPENSE">KHOẢN CHI (-)</option>
+                  <option value="INCOME">KHOẢN THU (+)</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label>Ngày giao dịch:</label>
-                <input type="date" id="tx-date" required />
-              </div>
-
-              <div class="form-group">
-                <label>Nội dung chi tiêu:</label>
+                <label class="form-label">Số tiền (VND):</label>
                 <input
                   type="text"
-                  id="tx-title"
-                  placeholder="Ví dụ: Tiền cơm trưa"
+                  id="input-tx-amount"
+                  class="form-input"
+                  placeholder="Ví dụ: 50.000"
+                  inputmode="numeric"
                   required
                 />
               </div>
 
               <div class="form-group">
-                <label>Số tiền (VNĐ):</label>
-                <input type="text" id="tx-amount" placeholder="0" required />
+                <label class="form-label">Danh mục chính:</label>
+                <select
+                  id="input-tx-cat-main"
+                  class="form-select"
+                  required
+                ></select>
               </div>
 
               <div class="form-group">
-                <label>Tài khoản thanh toán:</label>
-                <select id="tx-account"></select>
+                <label class="form-label">Danh mục con (Mục cụ thể):</label>
+                <select
+                  id="input-tx-cat-sub"
+                  class="form-select"
+                  required
+                ></select>
               </div>
 
               <div class="form-group">
-                <label>Thể loại > Kiểu con:</label>
-                <select id="tx-category"></select>
+                <label class="form-label">Tài khoản / Ví thanh toán:</label>
+                <select
+                  id="input-tx-method"
+                  class="form-select"
+                  required
+                ></select>
               </div>
 
-              <div class="form-btn-group" style="display: flex; gap: 10px">
-                <button type="submit" class="btn-submit" style="flex: 1">
+              <div class="form-group">
+                <label class="form-label">Ngày giao dịch:</label>
+                <input
+                  type="date"
+                  id="input-tx-date"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Ghi chú diễn giải:</label>
+                <input
+                  type="text"
+                  id="input-tx-note"
+                  class="form-input"
+                  placeholder="Ví dụ: Mua phở ăn sáng, Nhận lương tháng 5..."
+                />
+              </div>
+
+              <div class="form-btn-group">
+                <button
+                  type="button"
+                  id="btn-submit-transaction"
+                  class="btn-submit"
+                >
                   Ghi Vào Sổ Cái
                 </button>
                 <button
                   type="button"
                   id="btn-tx-cancel"
-                  class="btn-action delete"
-                  style="display: none; padding: 0 15px"
+                  class="btn-action delete btn-cancel"
+                  style="display: none"
                 >
                   Hủy
                 </button>
@@ -90,24 +123,39 @@
         </div>
 
         <div class="flex-col-data">
-          <fieldset>
+          <fieldset class="category-fieldset">
             <legend>Sổ Cái Nhật Ký Chi Tiêu</legend>
             <div class="table-responsive">
+              <div>
+                <div class="table-filter-limit">
+                  Hiển thị:
+                  <select
+                    id="select-rows-per-page"
+                    class="form-select select-limit"
+                  >
+                    <option value="5" selected>5 dòng</option>
+                    <option value="10">10 dòng</option>
+                    <option value="50">50 dòng</option>
+                    <option value="100">100 dòng</option>
+                  </select>
+                </div>
+              </div>
               <table class="classic-table">
                 <thead>
                   <tr>
-                    <th style="width: 90px">Ngày</th>
+                    <th style="width: 100px">Ngày</th>
                     <th style="width: 110px">Tài khoản</th>
                     <th style="width: 130px">Danh mục</th>
                     <th>Nội dung</th>
-                    <th class="text-right" style="width: 100px">Số tiền</th>
-                    <th class="text-center" style="width: 90px">Thao tác</th>
+                    <th style="text-align: right; width: 110px">Số tiền</th>
+                    <th class="text-center" style="width: 100px">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="table-transaction-body"></tbody>
               </table>
             </div>
             <div
+              id="tx-pagination"
               class="classic-pagination"
               style="margin-top: 15px; text-align: right"
             ></div>
@@ -116,19 +164,6 @@
       </div>
     </main>
 
-    <script src="js/account.js"></script>
-    <script src="js/category.js"></script>
     <script src="js/transaction.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Khởi tạo các ô Chọn (Select) dữ liệu từ trang cài đặt
-        if (typeof renderAccountSelects === "function") renderAccountSelects();
-        if (typeof renderCategorySelects === "function")
-          renderCategorySelects();
-
-        // Kích hoạt nạp danh sách giao dịch mẫu lên bảng
-        if (typeof initTransactionLogic === "function") initTransactionLogic();
-      });
-    </script>
   </body>
 </html>

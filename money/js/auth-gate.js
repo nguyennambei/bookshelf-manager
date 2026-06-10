@@ -35,3 +35,12 @@ async function verifyGlobalPin() {
         document.getElementById("global-pin").value = ""; // Xóa input sau khi sai
     }
 }
+
+function logout() {
+    // 1. Xóa trạng thái xác thực
+    sessionStorage.removeItem("is_authenticated");
+    
+    // 2. Chuyển hướng người dùng về trang chủ (Dashboard chọn app)
+    // Dùng ../ để thoát khỏi folder money/ về root
+    window.location.href = "../index.html"; 
+}

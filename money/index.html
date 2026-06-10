@@ -20,6 +20,7 @@
       <a href="bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
       <a href="setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
       <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
+      <a href="#" onclick="logout()" class="nav-link">Đăng xuất</a>
     </nav>
   </header>
 
@@ -31,18 +32,19 @@
           <form id="form-transaction" onsubmit="return false;">
             <input type="hidden" id="edit-tx-id" value="" />
 
-            <div class="form-group">
-              <label class="form-label">Loại giao dịch:</label>
-              <select id="input-tx-type" class="form-select" required>
-                <option value="EXPENSE">KHOẢN CHI (-)</option>
-                <option value="INCOME">KHOẢN THU (+)</option>
-              </select>
-            </div>
+            <div class="form-row" style="display: flex; gap: 15px;">
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">Loại giao dịch:</label>
+                <select id="input-tx-type" class="form-select" required>
+                  <option value="EXPENSE">KHOẢN CHI (-)</option>
+                  <option value="INCOME">KHOẢN THU (+)</option>
+                </select>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label">Số tiền (VND):</label>
-              <input type="text" id="input-tx-amount" class="form-input" placeholder="Ví dụ: 50.000" inputmode="numeric"
-                required />
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">Ngày giao dịch:</label>
+                <input type="date" id="input-tx-date" class="form-input" required />
+              </div>
             </div>
 
             <div class="form-group">
@@ -61,8 +63,9 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Ngày giao dịch:</label>
-              <input type="date" id="input-tx-date" class="form-input" required />
+              <label class="form-label">Số tiền (VND):</label>
+              <input type="text" id="input-tx-amount" class="form-input" placeholder="Ví dụ: 50.000" inputmode="numeric"
+                required />
             </div>
 
             <div class="form-group">

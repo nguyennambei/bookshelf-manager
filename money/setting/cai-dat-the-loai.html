@@ -1,102 +1,97 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <script src="js/auth-gate.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cài Đặt Thể Loại</title>
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/layout.css" />
-    <link rel="stylesheet" href="../css/components.css" />
-  </head>
-  <body>
-    <header class="app-header">
-      <h1>CẤU HÌNH THỂ LOẠI</h1>
-      <nav class="app-navigation">
-        <a href="../index.html" class="nav-link">Nhật Ký Giao Dịch</a>
-        <a href="../so-du-tai-khoan.html" class="nav-link">Số Dư Hiện Tại</a>
-        <a href="../bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
-        <a href="cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
-        <a href="cai-dat-the-loai.html" class="nav-link active">Cài Đặt Thể Loại</a>
-      </nav>
-    </header>
 
-    <main class="box_wrap">
-      <div class="flex-container">
-        
-        <div class="flex-col-form">
-          <fieldset class="category-fieldset">
-            <legend id="category-form-title">Thêm Thể Loại Mới</legend>
-            <form id="form-category" onsubmit="return false;">
-              <input type="hidden" id="edit-cat-id" value="" />
+<head>
+  <meta charset="UTF-8" />
+  <script src="js/auth-gate.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cài Đặt Thể Loại</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
 
-              <div class="form-group">
-                <label class="form-label">Loại dòng tiền:</label>
-                <select id="input-cat-type" class="form-select" required>
-                  <option value="EXPENSE">EXPENSE (Khoản Chi -)</option>
-                  <option value="INCOME">INCOME (Khoản Thu +)</option>
-                </select>
-              </div>
+<body>
+  <header class="app-header">
+    <h1>CẤU HÌNH THỂ LOẠI</h1>
+    <nav class="app-navigation">
+      <a href="../index.html" class="nav-link">Nhật Ký Giao Dịch</a>
+      <a href="../so-du-tai-khoan.html" class="nav-link">Số Dư Hiện Tại</a>
+      <a href="../bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
+      <a href="cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
+      <a href="cai-dat-the-loai.html" class="nav-link active">Cài Đặt Thể Loại</a>
+      <a href="#" onclick="logout()" class="nav-link">Đăng xuất</a>
+    </nav>
+  </header>
 
-              <div class="form-group">
-                <label class="form-label">Tên danh mục chính:</label>
-                <input
-                  type="text"
-                  id="input-cat-main"
-                  class="form-input"
-                  placeholder="Ví dụ: Ăn uống, Di chuyển, Tiền lương..."
-                  required
-                />
-              </div>
+  <main class="box_wrap">
+    <div class="flex-container">
 
-              <div class="form-group-sub">
-                <label class="form-label">Các mục con (Sub-categories):</label>
-                <div class="input-tag-row">
-                  <input
-                    type="text"
-                    id="input-cat-sub-field"
-                    class="form-input sub-input-field"
-                    placeholder="Gõ tên mục con (VD: Ăn sáng) rồi bấm [+]..."
-                  />
-                  <button type="button" id="btn-add-sub-tag" class="btn-action edit btn-plus">+</button>
-                </div>
-                <div id="sub-category-tags-container" class="tags-output-box"></div>
-              </div>
+      <div class="flex-col-form">
+        <fieldset class="category-fieldset">
+          <legend id="category-form-title">Thêm Thể Loại Mới</legend>
+          <form id="form-category" onsubmit="return false;">
+            <input type="hidden" id="edit-cat-id" value="" />
 
-              <div class="form-btn-group">
-                <button type="button" id="btn-submit-category" class="btn-submit">
-                  Lưu Danh Mục
-                </button>
-                <button type="button" id="btn-cat-cancel" class="btn-action delete btn-cancel">
-                  Hủy
-                </button>
-              </div>
-            </form>
-          </fieldset>
-        </div>
-
-        <div class="flex-col-data">
-          <fieldset class="category-fieldset">
-            <legend>Danh Sách Thể Loại Đang Sử Dụng</legend>
-            <div class="table-responsive">
-              <table class="classic-table">
-                <thead>
-                  <tr>
-                    <th>Loại dòng tiền</th>
-                    <th>Phân loại lớn</th>
-                    <th>Kiểu danh mục con</th>
-                    <th class="text-center th-action">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody id="table-category-body"></tbody>
-              </table>
+            <div class="form-group">
+              <label class="form-label">Loại dòng tiền:</label>
+              <select id="input-cat-type" class="form-select" required>
+                <option value="EXPENSE">EXPENSE (Khoản Chi -)</option>
+                <option value="INCOME">INCOME (Khoản Thu +)</option>
+              </select>
             </div>
-          </fieldset>
-        </div>
 
+            <div class="form-group">
+              <label class="form-label">Tên danh mục chính:</label>
+              <input type="text" id="input-cat-main" class="form-input"
+                placeholder="Ví dụ: Ăn uống, Di chuyển, Tiền lương..." required />
+            </div>
+
+            <div class="form-group-sub">
+              <label class="form-label">Các mục con (Sub-categories):</label>
+              <div class="input-tag-row">
+                <input type="text" id="input-cat-sub-field" class="form-input sub-input-field"
+                  placeholder="Gõ tên mục con (VD: Ăn sáng) rồi bấm [+]..." />
+                <button type="button" id="btn-add-sub-tag" class="btn-action edit btn-plus">+</button>
+              </div>
+              <div id="sub-category-tags-container" class="tags-output-box"></div>
+            </div>
+
+            <div class="form-btn-group">
+              <button type="button" id="btn-submit-category" class="btn-submit">
+                Lưu Danh Mục
+              </button>
+              <button type="button" id="btn-cat-cancel" class="btn-action delete btn-cancel">
+                Hủy
+              </button>
+            </div>
+          </form>
+        </fieldset>
       </div>
-    </main>
 
-    <script src="../js/category.js"></script>
-  </body>
+      <div class="flex-col-data">
+        <fieldset class="category-fieldset">
+          <legend>Danh Sách Thể Loại Đang Sử Dụng</legend>
+          <div class="table-responsive">
+            <table class="classic-table">
+              <thead>
+                <tr>
+                  <th>Loại dòng tiền</th>
+                  <th>Phân loại lớn</th>
+                  <th>Kiểu danh mục con</th>
+                  <th class="text-center th-action">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="table-category-body"></tbody>
+            </table>
+          </div>
+        </fieldset>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../js/category.js"></script>
+</body>
+
 </html>

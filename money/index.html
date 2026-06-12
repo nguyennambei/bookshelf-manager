@@ -3,16 +3,19 @@
 
 <head>
   <meta charset="UTF-8" />
-  <script src="js/auth-gate.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sổ Thu Chi Cổ Điển - Nhật Ký Giao Dịch</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <script type="module" src="../js/auth-guard.js"></script>
 </head>
 
 <body>
   <header class="app-header">
+    <button onclick="window.location.href='../index.html'" class="btn-back">
+        ← Quay lại Dashboard
+    </button>
     <h1>SỔ THU CHI CỔ ĐIỂN</h1>
     <nav class="app-navigation">
       <a href="index.html" class="nav-link active">Nhật Ký Giao Dịch</a>
@@ -20,7 +23,6 @@
       <a href="bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
       <a href="setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
       <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
-      <a href="#" onclick="logout()" class="nav-link">Đăng xuất</a>
     </nav>
   </header>
 
@@ -130,6 +132,7 @@
   </main>
 
   <script src="js/transaction.js"></script>
+
 </body>
 
 </html>

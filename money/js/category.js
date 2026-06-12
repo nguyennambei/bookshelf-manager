@@ -1,58 +1,56 @@
 // =========================================================================
-// 1. KHỞI TẠO BỘ DATA GỐC CHUẨN CẤU TRÚC MẢNG LỒNG & STATUS
+// 0. IMPORT ĐỐI TƯỢNG DB TỪ FILE CẤU HÌNH CÓ SẴN VÀ FIREBASE SDK
 // =========================================================================
-let categories = JSON.parse(localStorage.getItem("classic_categories")) || [
-    { 
-        id: "cat_1", 
-        name: "Ăn uống", 
-        type: "EXPENSE", 
-        subCategories: ["Ăn sáng", "Ăn trưa", "Cà phê & Hẹn hò"],
-        createDate: "2026-06-01T08:00:00.000Z",
-        updateDate: "2026-06-01T08:00:00.000Z",
-        status: "ACTIVE"
-    },
-    { 
-        id: "cat_2", 
-        name: "Di chuyển", 
-        type: "EXPENSE", 
-        subCategories: ["Xăng xe", "Sửa xe & Bảo dưỡng", "Taxi/Grab"],
-        createDate: "2026-06-01T08:30:00.000Z",
-        updateDate: "2026-06-01T08:30:00.000Z",
-        status: "ACTIVE"
-    },
-    { 
-        id: "cat_3", 
-        name: "Tiền lương", 
-        type: "INCOME", 
-        subCategories: ["Lương chính thức", "Thưởng KPIs", "Freelance"],
-        createDate: "2026-06-02T09:00:00.000Z",
-        updateDate: "2026-06-02T09:00:00.000Z",
-        status: "ACTIVE"
-    }
-];
+import { db } from "../../js/firebase-config.js"; // Đường dẫn tới file cấu hình của bạn
+import { 
+    collection, addDoc, updateDoc, doc, onSnapshot, query, where 
+} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
+// Tham chiếu tới collection 'categories' trên Firestore
+const categoriesCollection = collection(db, "categories");
+
+// Mảng cục bộ để lưu trữ và quản lý danh sách danh mục đồng bộ từ Firebase
+let categories = []; 
 // Mảng tạm thời để quản lý danh sách danh mục con đang thao tác trên Form
 let currentSubCategories = [];
 
 // Tự động kích hoạt khi trang web nạp xong cấu trúc DOM
 document.addEventListener("DOMContentLoaded", () => {
     initCategoryLogic();
+    listenToCategories(); // Kích hoạt lắng nghe dữ liệu thời gian thực
 });
 
 // =========================================================================
-// 2. HÀM XỬ LÝ LOGIC CORE
+// 1. LẮNG NGHE DỮ LIỆU THỜI GIAN THỰC (REALTIME LISTENER)
+// =========================================================================
+function listenToCategories() {
+    // Tạo truy vấn chỉ lấy các danh mục chưa bị xóa mềm (status != DELETED)
+    const q = query(categoriesCollection, where("status", "!=", "DELETED"));
+
+    // Lắng nghe biến động dữ liệu từ Firestore
+    onSnapshot(q, (snapshot) => {
+        categories = []; // Reset lại mảng cục bộ trước khi nạp dữ liệu mới
+        
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            categories.push({
+                id: doc.id, // Lấy ID tự động do Firebase sinh ra
+                ...data
+            });
+        });
+
+        // Tự động vẽ lại bảng và select box bất cứ khi nào DB thay đổi
+        renderCategoryTable();
+        renderCategorySelects();
+    }, (error) => {
+        console.error("Lỗi khi lắng nghe dữ liệu: ", error);
+    });
+}
+
+// =========================================================================
+// 2. HÀM XỬ LÝ LOGIC CORE FORMS
 // =========================================================================
 function initCategoryLogic() {
-    // Nạp dữ liệu từ localStorage nếu có sẵn
-    if (!localStorage.getItem("classic_categories") || JSON.parse(localStorage.getItem("classic_categories")).length === 0) {
-        localStorage.setItem("classic_categories", JSON.stringify(categories));
-    } else {
-        categories = JSON.parse(localStorage.getItem("classic_categories"));
-    }
-
-    // Vẽ bảng quản lý ở cột bên phải
-    renderCategoryTable();
-
     const subField = document.getElementById("input-cat-sub-field");
     const btnAddSub = document.getElementById("btn-add-sub-tag");
     const btnSubmitMain = document.getElementById("btn-submit-category");
@@ -73,7 +71,6 @@ function initCategoryLogic() {
             const tag = document.createElement("span");
             tag.style.cssText = "background: #eef5f9; color: #2c3e50; border: 1px solid #d4e6f1; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500;";
             
-            // Truyền tham số 'event' vào hàm xóa để chặn lan truyền sự kiện kích hoạt form submit bậy
             tag.innerHTML = `
                 ${subName}
                 <span onclick="removeSubFormTag(${index}, event)" style="color: #c0392b; cursor: pointer; font-weight: bold; font-size: 13px; padding: 0 2px;">×</span>
@@ -94,12 +91,11 @@ function initCategoryLogic() {
                     return;
                 }
                 currentSubCategories.push(val);
-                subField.value = ""; // Xóa trống ô input để gõ từ tiếp theo
+                subField.value = ""; 
                 renderSubFormTags();
             }
         };
 
-        // Chặn phím Enter trong ô gõ không cho submit form, chuyển hướng thành click nút [+]
         subField.onkeydown = function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
@@ -113,17 +109,17 @@ function initCategoryLogic() {
     window.removeSubFormTag = function(index, event) {
         if (event) {
             event.preventDefault();
-            event.stopPropagation(); // Chặn tuyệt đối không cho chạm vào luồng lưu của Form cha
+            event.stopPropagation(); 
         }
         currentSubCategories.splice(index, 1);
         renderSubFormTags();
     }
 
-    // --- D. LOGIC KHI BẤM NÚT LƯU DANH MỤC (CẬP NHẬT CHUẨN SỬA/THÊM) ---
+    // --- D. LOGIC KHI BẤM NÚT LƯU DANH MỤC (THÊM / SỬA LÊN FIREBASE) ---
     if (btnSubmitMain) {
         btnSubmitMain.onclick = null; 
 
-        btnSubmitMain.onclick = function (e) {
+        btnSubmitMain.onclick = async function (e) {
             if (e) e.preventDefault();
 
             const editId = document.getElementById("edit-cat-id").value;
@@ -136,64 +132,53 @@ function initCategoryLogic() {
                 return;
             }
 
-            // Kiểm tra mảng con rỗng
             if (currentSubCategories.length === 0) {
                 alert("Lỗi: Danh mục phải có ít nhất một mục con (Sub-category)!");
                 return;
             }
 
-            // Tách mảng con ra một biến độc lập để tránh bị tham chiếu hoặc reset sớm
             const finalSubCategories = [...currentSubCategories];
 
-            if (editId) {
-                // CHẾ ĐỘ CẬP NHẬT (SỬA)
-                // Duyệt qua mảng tìm đúng ID để đè dữ liệu mới bao gồm cả mảng danh mục con mới
-                categories = categories.map(cat => {
-                    if (cat.id === editId) {
-                        return { 
-                            ...cat, 
-                            name: name, 
-                            type: type, 
-                            subCategories: finalSubCategories, // Ghi đè mảng con mới vào đây
-                            updateDate: nowIso 
-                        };
-                    }
-                    return cat;
-                });
-                
-                // Trả form về trạng thái Thêm mới
-                document.getElementById("edit-cat-id").value = "";
-                document.getElementById("category-form-title").textContent = "Thêm Thể Loại Mới";
-                if (cancelBtn) cancelBtn.style.display = "none";
-            } else {
-                // CHẾ ĐỘ TẠO MỚI (THÊM)
-                const newCat = {
-                    id: "cat_" + Date.now(),
-                    name: name,
-                    type: type,
-                    subCategories: finalSubCategories,
-                    createDate: nowIso,
-                    updateDate: nowIso,
-                    status: "ACTIVE"
-                };
-                categories.push(newCat);
-            }
+            try {
+                if (editId) {
+                    // CHẾ ĐỘ CẬP NHẬT (SỬA TRÊN FIREBASE)
+                    const docRef = doc(db, "categories", editId);
+                    await updateDoc(docRef, {
+                        name: name,
+                        type: type,
+                        subCategories: finalSubCategories,
+                        updateDate: nowIso
+                    });
+                    
+                    // Trả form về trạng thái Thêm mới
+                    document.getElementById("edit-cat-id").value = "";
+                    document.getElementById("category-form-title").textContent = "Thêm Thể Loại Mới";
+                    if (cancelBtn) cancelBtn.style.display = "none";
+                } else {
+                    // CHẾ ĐỘ TẠO MỚI (THÊM VÀO FIREBASE)
+                    const newCat = {
+                        name: name,
+                        type: type,
+                        subCategories: finalSubCategories,
+                        createDate: nowIso,
+                        updateDate: nowIso,
+                        status: "ACTIVE"
+                    };
+                    await addDoc(categoriesCollection, newCat);
+                }
 
-            // ĐỒNG BỘ QUAN TRỌNG: Lưu thẳng danh sách mới vừa cập nhật vào LocalStorage
-            localStorage.setItem("classic_categories", JSON.stringify(categories));
-            
-            // Vẽ lại bảng ngay lập tức để cập nhật giao diện hiển thị các tag con mới
-            renderCategoryTable();
-            
-            // Dọn dẹp bộ nhớ tạm và làm trống Form
-            currentSubCategories = []; 
-            const formEl = document.getElementById("form-category");
-            if (formEl) formEl.reset();
-            
-            // Render lại khu vực tag con trên form (lúc này sẽ về trạng thái trống)
-            renderSubFormTags();
-            
-            alert("Đã lưu thay đổi danh mục thành công!");
+                // Dọn dẹp bộ nhớ tạm và làm trống Form
+                currentSubCategories = []; 
+                const formEl = document.getElementById("form-category");
+                if (formEl) formEl.reset();
+                
+                renderSubFormTags();
+                alert("Đã lưu dữ liệu lên hệ thống Cloud thành công!");
+                
+            } catch (error) {
+                console.error("Lỗi thao tác Firebase: ", error);
+                alert("Không thể kết nối máy chủ Cloud để lưu dữ liệu!");
+            }
         };
     }
 
@@ -211,24 +196,18 @@ function initCategoryLogic() {
         };
     }
 
-    // Khởi chạy vẽ hộp tag rỗng ban đầu khi load trang
     renderSubFormTags();
 }
 
 // =========================================================================
-// 3. CÁC HÀM PHỤ TRỢ (LƯU TRỮ & IN BẢNG)
+// 3. CÁC HÀM IN BẢNG & ĐIỀU HƯỚNG (GIAO DIỆN)
 // =========================================================================
-function saveCategories() {
-    localStorage.setItem("classic_categories", JSON.stringify(categories));
-    renderCategoryTable();
-}
-
 function renderCategoryTable() {
     const tbody = document.getElementById("table-category-body");
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    // Chỉ lấy các danh mục ACTIVE để hiển thị trên bảng cấu hình
+    // Lọc các danh mục ACTIVE từ mảng cục bộ đã sync với Firebase
     const activeCategories = categories.filter(cat => cat.status !== "DELETED");
 
     activeCategories.forEach(cat => {
@@ -254,49 +233,48 @@ function renderCategoryTable() {
     });
 }
 
-function editCategory(id) {
+window.editCategory = function(id) {
     const cat = categories.find(c => c.id === id);
     if (!cat || cat.status === "DELETED") return;
 
-    // Đổ dữ liệu cha lên form
     document.getElementById("edit-cat-id").value = cat.id;
     document.getElementById("input-cat-main").value = cat.name;
     document.getElementById("input-cat-type").value = cat.type;
     
-    // Sao chép mảng con vào mảng tạm thời rồi vẽ các tag trực quan lên form
     currentSubCategories = [...cat.subCategories];
     renderSubFormTags();
 
-    // Cập nhật trạng thái giao diện form
     document.getElementById("category-form-title").textContent = "Sửa Thể Loại Hệ Thống";
     
     const cancelBtn = document.getElementById("btn-cat-cancel");
     if (cancelBtn) cancelBtn.style.display = "inline-block";
     
-    // Cuộn mượt màn hình lên đầu trang
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function deleteCategory(id) {
+window.deleteCategory = async function(id) {
     if (confirm("Xác nhận xóa danh mục chính này? Lịch sử chi tiêu cũ đã ghi chép của danh mục này vẫn sẽ được bảo toàn chính xác.")) {
         const nowIso = new Date().toISOString();
-        
-        // Thực hiện SOFT DELETE (Xóa mềm): Đổi status thành DELETED thay vì lọc bỏ hoàn toàn
-        categories = categories.map(cat => 
-            cat.id === id ? { ...cat, status: "DELETED", updateDate: nowIso } : cat
-        );
-        
-        saveCategories();
+        try {
+            // SOFT DELETE: Update status sang DELETED trên tài nguyên Cloud
+            const docRef = doc(db, "categories", id);
+            await updateDoc(docRef, {
+                status: "DELETED",
+                updateDate: nowIso
+            });
+            alert("Đã xóa danh mục thành công!");
+        } catch (error) {
+            console.error("Lỗi khi xóa dữ liệu: ", error);
+            alert("Không thể xóa danh mục, vui lòng kiểm tra kết nối mạng!");
+        }
     }
 }
 
-// HÀM XUẤT DỮ LIỆU SANG SELECT BOX TRANG CHỦ (CHỈ LẤY CÁC MỤC ACTIVE)
 function renderCategorySelects() {
     const mainSelect = document.getElementById("tx-category-main");
     if (!mainSelect) return;
 
-    const localCats = JSON.parse(localStorage.getItem("classic_categories")) || categories;
-    const activeCats = localCats.filter(c => c.status !== "DELETED");
+    const activeCats = categories.filter(c => c.status !== "DELETED");
 
     mainSelect.innerHTML = "";
     activeCats.forEach(cat => {

@@ -1,30 +1,57 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>My Personal Dashboard</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f7f6; margin: 0; }
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .card { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s; cursor: pointer; }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
-        .card h2 { color: #2c3e50; }
-        .card p { color: #7f8c8d; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Cá Nhân</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-    <div class="dashboard">
-        <div class="card" onclick="window.location.href='money/index.html'">
-            <h2>💰 Sổ Thu Chi</h2>
-            <p>Quản lý chi tiêu, số dư và báo cáo</p>
-        </div>
+    <div class="dashboard-wrapper">
+        <header class="main-header" id="user-header" style="display: none;">
+            <div class="user-profile">
+                <div class="avatar">👤</div>
+                <span id="display-name">Người dùng</span>
+            </div>
+            <button id="logout-btn" class="logout-link">Đăng xuất</button>
+        </header>
 
-        <div class="card" onclick="window.location.href='manga/index.html'">
-            <h2>📚 MangaShelf Manager</h2>
-            <p>Quản lý tủ truyện và tiến độ đọc</p>
-        </div>
+        <main class="content">
+            <section id="auth-box" class="auth-card">
+                <h2>Xin chào!</h2>
+                <p>Vui lòng đăng nhập để quản lý ứng dụng</p>
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="Email của bạn">
+                    <input type="password" id="password" placeholder="Mật khẩu">
+                </div>
+                <button id="login-btn" class="btn-primary">Đăng Nhập</button>
+            </section>
+
+            <section id="app-box" class="app-grid" style="display: none;">
+                <a href="money/index.html" class="app-item">
+                    <div class="app-icon" style="background: #e3f2fd;">💰</div>
+                    <div class="app-info">
+                        <h3>Sổ Thu Chi</h3>
+                        <p>Quản lý dòng tiền cá nhân</p>
+                    </div>
+                </a>
+
+                <a href="manga/index.html" class="app-item">
+                    <div class="app-icon" style="background: #f3e5f5;">📚</div>
+                    <div class="app-info">
+                        <h3>Manga Shelf</h3>
+                        <p>Bộ sưu tập truyện tranh</p>
+                    </div>
+                </a>
+            </section>
+        </main>
     </div>
 
+    <script type="module" src="js/auth-dashboard.js"></script>
 </body>
+
 </html>

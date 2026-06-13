@@ -3,27 +3,34 @@
 
 <head>
     <meta charset="UTF-8">
-    <script src="js/auth-gate.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Số Dư Tài Khoản Thực Tế</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/components.css" />
-    <link rel="stylesheet" href="css/so-du-tai-khoan.css">
+
+    <script type="module" src="/js/auth-gate.js"></script>
+
+    <link rel="stylesheet" href="/money/css/style.css?v=4">
+    <link rel="stylesheet" href="/money/css/layout.css?v=4" />
+    <link rel="stylesheet" href="/money/css/components.css?v=4" />
+    <link rel="stylesheet" href="/money/css/so-du-tai-khoan.css?v=4">
 </head>
 
 <body>
     <header class="app-header">
-        <h1>SỔ THU CHI CỔ ĐIỂN</h1>
-        <nav class="app-navigation">
-            <a href="index.html" class="nav-link">Nhật Ký Giao Dịch</a>
-            <a href="so-du-tai-khoan.html" class="nav-link active">Số Dư Hiện Tại</a>
-            <a href="bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
-            <a href="setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
-            <a href="setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
-        </nav>
-    </header>
+    <button onclick="window.location.href='../index.html'" class="btn-back">
+      ← Quay lại Dashboard
+    </button>
+    <h1>SỔ THU CHI CỔ ĐIỂN</h1>
+    <nav class="app-navigation">
+      <a href="/money/index.html" class="nav-link">Nhật Ký Giao Dịch</a>
+      <a href="/money/so-du-tai-khoan.html" class="nav-link active">Số Dư Hiện Tại</a>
+      <a href="/money/bao-cao-thang.html" class="nav-link">Báo Cáo Tháng</a>
+      <a href="/money/setting/cai-dat-tai-khoan.html" class="nav-link">Cài Đặt Tài Khoản</a>
+      <a href="/money/setting/cai-dat-the-loai.html" class="nav-link">Cài Đặt Thể Loại</a>
+    </nav>
+  </header>
+
     <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        
         <div class="total-summary-box">
             <div>
                 <h2>TỔNG TÀI SẢN THỰC TẾ HỆ THỐNG</h2>
@@ -73,7 +80,7 @@
                     </fieldset>
 
                     <fieldset class="category-fieldset" style="margin-top: 20px;">
-                        <legend>Nhật Ký Biến Động Số Dư Gần Đây</legend>
+                        <legend>Nhật Ký Biến Động Số Dư Gần Tây</legend>
                         <div class="table-responsive">
                             <table class="classic-table">
                                 <thead>
@@ -81,7 +88,7 @@
                                         <th style="width: 90px;">Ngày</th>
                                         <th>Tài khoản</th>
                                         <th>Nội dung biến động / Lý do</th>
-                                        <th style="text-align: right; width: 120px;">Số tiền sau chỉnh</th>
+                                        <th style="text-align: right; width: 120px;">Biến động</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-balance-history-body">
@@ -95,7 +102,7 @@
         </div>
     </div>
 
-    <script src="js/so-du-tai-khoan.js"></script>
+    <script type="module" src="/money/js/balance.js?v=4"></script>
 </body>
 
 </html>

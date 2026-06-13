@@ -1,60 +1,133 @@
 :root {
-    --primary: #4f46e5;
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --text: #1e293b;
+  --primary: #4f46e5;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --color-primary: #bf0000; /* Đỏ đô điểm nhấn chủ đạo */
+  --color-bg-paper: #f5f2e9; /* Màu giấy tập cũ ngả vàng */
+  --color-text-main: #2b2b2b; /* Màu chữ xám đen */
+  --color-border-dark: #333333; /* Màu viền thô cứng */
+  --font-classic: Consolas, "Courier New", Courier, monospace;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-    font-family: 'Inter', sans-serif; 
-    background-color: var(--bg); 
-    color: var(--text);
-    display: flex; justify-content: center; min-height: 100vh;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: var(--font-classic);
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-.dashboard-wrapper { width: 100%; max-width: 600px; padding: 20px; }
+.dashboard-wrapper {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+}
 
 /* Header */
-.main-header { 
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px 0; margin-bottom: 30px; border-bottom: 1px solid #e2e8f0;
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
 }
-.user-profile { display: flex; align-items: center; gap: 10px; font-weight: 600; }
-.logout-link { 
-    background: none; border: none; color: #ef4444; 
-    cursor: pointer; font-size: 14px; font-weight: 600;
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+.logout-link {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* Auth Card */
-.auth-card { 
-    background: var(--card); padding: 40px; border-radius: 16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); text-align: center;
+.auth-card {
+  background: var(--card);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
-.auth-card h2 { margin-bottom: 10px; font-size: 24px; }
-.auth-card p { color: #64748b; margin-bottom: 30px; }
+.auth-card h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+.auth-card p {
+  color: #64748b;
+  margin-bottom: 30px;
+}
 
-.form-group input { 
-    width: 100%; padding: 12px; margin-bottom: 15px;
-    border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px;
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
 }
-.btn-primary { 
-    width: 100%; padding: 14px; background: var(--primary); color: white;
-    border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 /* App Grid */
-.app-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-.app-item { 
-    background: var(--card); display: flex; align-items: center; gap: 20px;
-    padding: 20px; border-radius: 12px; text-decoration: none; color: inherit;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #f1f5f9;
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
 }
-.app-item:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.app-icon { 
-    width: 60px; height: 60px; display: flex; align-items: center; 
-    justify-content: center; border-radius: 12px; font-size: 30px;
+.app-item {
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  border: 1px solid #f1f5f9;
 }
-.app-info h3 { font-size: 18px; margin-bottom: 4px; }
-.app-info p { font-size: 14px; color: #64748b; }
+.app-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.app-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 30px;
+}
+.app-info h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.app-info p {
+  font-size: 14px;
+  color: #64748b;
+}

@@ -11,7 +11,7 @@
     --color-bg-paper: #f5f2e9;   /* Màu giấy tập cũ ngả vàng */
     --color-text-main: #2b2b2b;  /* Màu chữ xám đen */
     --color-border-dark: #333333;/* Màu viền thô cứng */
-    --font-classic: "Courier New", Courier, Georgia, serif;
+    --font-classic: Consolas, "Courier New", Courier, monospace;
 }
 
 body {
